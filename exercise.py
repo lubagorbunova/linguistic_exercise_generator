@@ -1,3 +1,5 @@
+from nltk.tokenize import sent_tokenize
+
 class Exercise:
     def __init__(self, text: str):
         self.raw_text = text
@@ -48,6 +50,19 @@ class Exercise:
         разбить на предложения, сложить в массив
         :return:
         """
+        self.sentences = sent_tokenize(self.raw_text)
+
+    def process_text(self):
+        """
+        заполняет все атрибуты класса? делает всю обработку текста?
+        :return:
+        """
+        self.tokenise_text()
+        self.lemmatise_text()
+        self.morph_text()
+        self.vectorize_text()
+        self.split_to_sentences()
+        self.vectorize_text()
 
 """
 идеи для упражнений:
