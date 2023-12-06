@@ -1,5 +1,7 @@
 from nltk.tokenize import sent_tokenize
 from navec import Navec
+from pymorphy2 import MorphAnalyzer
+
 
 
 class TextProcessor:
@@ -11,6 +13,7 @@ class TextProcessor:
         self._raw_text = text
         self._lemma_text = None
         self._tokens = []
+        self._morph_analyzer = MorphAnalyzer()
         self._morph = None
         self._vector = {}
         self._sentences = []
@@ -21,6 +24,7 @@ class TextProcessor:
         посмотреть прошлогоднюю лабу
         :return:
         """
+        pass
 
     def lemmatise_text(self):
         """
@@ -28,6 +32,7 @@ class TextProcessor:
         посмотреть прошлогоднюю лабу
         :return:
         """
+        self._lemma_text = [self._morph_analyzer.parse(token)[0].normal_form for token in self._tokens]
 
     def write_to_file(self):
         """
@@ -42,6 +47,7 @@ class TextProcessor:
         выделить морфологические признаки слов
         :return:
         """
+        self._morph = [self._morph_analyzer.parse(token)[0].tag for token in self._tokens]
 
     def vectorize_text(self):
         """
