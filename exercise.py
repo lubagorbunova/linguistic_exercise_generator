@@ -1,12 +1,18 @@
 from nltk.tokenize import sent_tokenize
+import string
+from gensim.models.phrases import Phrases, Phraser
+import multiprocessing
+from gensim.models import Word2Vec
+from navec import Navec
 
-class Text_processor:
+
+class TextProcessor:
     def __init__(self, text: str):
         self._raw_text = text
         self._lemma_text = None
-        self._tokens = None
+        self._tokens = []
         self._morph = None
-        self._vector = None
+        self._vector = []
         self._sentences = None  # массив
 
     def tokenise_text(self):
@@ -43,6 +49,11 @@ class Text_processor:
         найти векторы слов для упражнений на семантику
         :return:
         """
+        path = 'navec_hudlit_v1_12B_500K_300d_100q.tar'
+        navec = Navec.load(path)
+        for token in self._tokens:
+            self._vector.append(navec[token])
+
 
     def split_to_sentences(self):
         """
@@ -79,9 +90,12 @@ class Text_processor:
     def get_tokens(self):
         return self._tokens
 
+    def get_vectors(self):
+        return self._vector
+
 
 class Exercise:
-    def __init__(self, processed_text: Text_processor):
+    def __init__(self, processed_text: TextProcessor):
         """
         идеи для упражнений:
         1. синонимы - Соня
