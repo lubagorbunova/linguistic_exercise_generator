@@ -1,13 +1,13 @@
 from nltk.tokenize import sent_tokenize
 
-class Exercise:
+class Text_processor:
     def __init__(self, text: str):
-        self.raw_text = text
-        self.lemma_text = None
-        self.tokens = None
-        self.morph = None
-        self.vector = None
-        self.sentences = None  # массив
+        self._raw_text = text
+        self._lemma_text = None
+        self._tokens = None
+        self._morph = None
+        self._vector = None
+        self._sentences = None  # массив
 
     def tokenise_text(self):
         """
@@ -50,7 +50,7 @@ class Exercise:
         разбить на предложения, сложить в массив
         :return:
         """
-        self.sentences = sent_tokenize(self.raw_text)
+        self._sentences = sent_tokenize(self._raw_text)
 
     def process_text(self):
         """
@@ -64,12 +64,30 @@ class Exercise:
         self.split_to_sentences()
         self.vectorize_text()
 
-"""
-идеи для упражнений:
-1. синонимы - Соня
-2. антонимы - Соня
-3. поменять структуру предложений (вопрос из утверждения и тд) - Полина
-4. выбрать нужный падеж - Полина
-5. выбрать правильную форму слова - Люба
-6. выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?) - Люба
-"""
+    def get_raw_text(self):
+        return self._raw_text
+
+    def get_lemmas(self):
+        return self._lemma_text
+
+    def get_morph(self):
+        return self._morph
+
+    def get_sentences(self):
+        return self._sentences
+
+    def get_tokens(self):
+        return self._tokens
+
+
+class Exercise:
+    def __init__(self, processed_text: Text_processor):
+        """
+        идеи для упражнений:
+        1. синонимы - Соня
+        2. антонимы - Соня
+        3. поменять структуру предложений (вопрос из утверждения и тд) - Полина
+        4. выбрать нужный падеж - Полина
+        5. выбрать правильную форму слова - Люба
+        6. выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?) - Люба
+        """
