@@ -1,5 +1,8 @@
-from nltk.tokenize import sent_tokenize
+from constants import punctuation, ASSETS_PATH
 from navec import Navec
+
+from nltk.tokenize import sent_tokenize
+from pathlib import Path
 from pymorphy2 import MorphAnalyzer
 
 
@@ -12,19 +15,24 @@ class TextProcessor:
     def __init__(self, text: str):
         self._raw_text = text
         self._lemma_text = None
+
         self._tokens = []
+
         self._morph_analyzer = MorphAnalyzer()
         self._morph = None
         self._vector = {}
         self._sentences = []
 
-    def tokenise_text(self):
+    def _tokenise_text(self, text: str) -> None:
         """
-        Соня
-        посмотреть прошлогоднюю лабу
-        :return:
+        Очищает текст от знаков препинания, приводит к нижнему регистру, разбивает на токены
+        return: None
         """
-        pass
+
+        for el in punctuation:
+            text = text.replace(el, '')
+        self._tokens = tuple(text.lower().split())
+
 
     def lemmatise_text(self):
         """
@@ -34,12 +42,6 @@ class TextProcessor:
         """
         self._lemma_text = [self._morph_analyzer.parse(token)[0].normal_form for token in self._tokens]
 
-    def write_to_file(self):
-        """
-        Соня
-        файл с упражнениями, который передается пользователю
-        :return:
-        """
 
     def morph_text(self):
         """
@@ -72,7 +74,7 @@ class TextProcessor:
         Выполняет предобработку текста.
         :return: None
         """
-        self.tokenise_text()
+        self._tokenise_text(self.get_raw_text())
         self.lemmatise_text()
         self.morph_text()
         self.vectorize_text()
@@ -133,3 +135,24 @@ class Exercise:
         5. выбрать правильную форму слова - Люба
         6. выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?) - Люба
         """
+
+
+class FinalFiles:
+    def __init__(self):
+        pass
+
+    def get_exercises_path(self) -> Path:
+        """
+        Returns path for requested exercise
+        """
+        exercise_name = f"exercise_raw.txt"
+        return ASSETS_PATH / exercise_name
+
+    def write_to_file(self, ex_text: str) -> None:
+        """
+        Соня
+        файл с упражнениями, который передается пользователю
+        :return:
+        """
+        with open(self.get_exercises_path(), 'w', encoding='utf-8') as file:
+            file.write(ex_text)

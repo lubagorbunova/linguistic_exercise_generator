@@ -10,4 +10,4 @@ if __name__ == '__main__':
     print("Sentences:", ex1.get_sentences())
     print("Lemmas:", ex1.get_lemmas())
     print("Morphological Features:", ex1.get_morph())
-
+    
