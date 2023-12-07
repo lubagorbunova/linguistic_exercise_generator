@@ -1,8 +1,10 @@
 from constants import punctuation, ASSETS_PATH
 from navec import Navec
+
 from nltk.tokenize import sent_tokenize
 from pathlib import Path
 from pymorphy2 import MorphAnalyzer
+
 
 
 class TextProcessor:
@@ -13,7 +15,9 @@ class TextProcessor:
     def __init__(self, text: str):
         self._raw_text = text
         self._lemma_text = None
-        self._tokens = None
+
+        self._tokens = []
+
         self._morph_analyzer = MorphAnalyzer()
         self._morph = None
         self._vector = {}
@@ -24,9 +28,11 @@ class TextProcessor:
         Очищает текст от знаков препинания, приводит к нижнему регистру, разбивает на токены
         return: None
         """
+
         for el in punctuation:
             text = text.replace(el, '')
         self._tokens = tuple(text.lower().split())
+
 
     def lemmatise_text(self):
         """
@@ -35,6 +41,7 @@ class TextProcessor:
         :return:
         """
         self._lemma_text = [self._morph_analyzer.parse(token)[0].normal_form for token in self._tokens]
+
 
     def morph_text(self):
         """
