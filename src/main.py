@@ -1,7 +1,8 @@
 from exercise import TextProcessor
+import os.path
 
 if __name__ == '__main__':
-    with open('text_file.txt', encoding='utf-8') as file:
+    with open(os.path.dirname(__file__) + '/../text_file.txt', encoding='utf-8') as file:
         text = file.read()
     ex1 = TextProcessor(text)
     ex1.process_text()

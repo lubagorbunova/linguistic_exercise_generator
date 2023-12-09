@@ -3,6 +3,7 @@ from navec import Navec
 from nltk.tokenize import sent_tokenize
 from pathlib import Path
 from pymorphy2 import MorphAnalyzer
+import os.path
 
 
 class TextProcessor:
@@ -50,10 +51,13 @@ class TextProcessor:
         находит векторы для каждого токена. Пары токен-вектор хранятся в словаре
         :return: None
         """
-        path = 'navec_hudlit_v1_12B_500K_300d_100q.tar'
+        path = os.path.dirname(__file__) + '/../navec_hudlit_v1_12B_500K_300d_100q.tar'
         navec = Navec.load(path)
         for token in self._tokens:
-            self._vector[token] = navec[token]
+            if token in navec.vocab:
+                self._vector[token] = navec[token]
+            else:
+                self._vector[token] = None
 
     def _split_to_sentences(self):
         """
