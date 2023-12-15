@@ -1,6 +1,6 @@
 import random
 
-from constants import punctuation, ASSETS_PATH
+from src.constants import punctuation, ASSETS_PATH
 from navec import Navec
 from nltk.tokenize import sent_tokenize
 import nltk.text
