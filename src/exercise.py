@@ -1,3 +1,5 @@
+import random
+
 from constants import punctuation, ASSETS_PATH
 from navec import Navec
 from nltk.tokenize import sent_tokenize
@@ -144,6 +146,33 @@ class Exercise:
         объединяет все упражнения в один файл
         :return:
         '''
+
+    def select_grammatical_form(self):
+        """
+        выбрать правильную форму слова
+        :return:
+        """
+        morphs = self.processed_text.get_morph()
+        tokens = self.processed_text.get_tokens()
+        lemmas = self.processed_text.get_lemmas()
+        possible_change = []
+
+        for i in range(len(tokens)):
+            if ('NOUN' in str(morphs[i])) or ('VERB' in str(morphs[i])):
+                possible_change.append(i)
+
+        to_change_index = random.sample(possible_change, 10)
+        to_change = {}
+
+        for ind in to_change_index:
+            to_change[tokens[ind]] = f'[{lemmas[ind]}]'
+
+        text = self.processed_text.get_raw_text()
+
+        for old, new in to_change.items():
+            text = text.replace(old, new, 1)
+
+        self.fifth_ex = text
 
 
 class FinalFiles:
