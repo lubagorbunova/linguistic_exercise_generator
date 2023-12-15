@@ -139,6 +139,7 @@ class Exercise:
         self.third_ex = ''
         self.fourth_ex = ''
         self.fifth_ex = ''
+        self.fifth_answers = ''
         self.sixth_ex = ''
 
     def form_exercises(self):
@@ -152,6 +153,9 @@ class Exercise:
         выбрать правильную форму слова
         :return:
         """
+        sentences = random.sample(self.processed_text.get_sentences(), 5)
+        text = '\n'.join(sentences)
+        self.fifth_answers = text
         morphs = self.processed_text.get_morph()
         tokens = self.processed_text.get_tokens()
         lemmas = self.processed_text.get_lemmas()
@@ -159,7 +163,8 @@ class Exercise:
 
         for i in range(len(tokens)):
             if ('NOUN' in str(morphs[i])) or ('VERB' in str(morphs[i])):
-                possible_change.append(i)
+                if tokens[i] in text:
+                    possible_change.append(i)
 
         to_change_index = random.sample(possible_change, 10)
         to_change = {}
@@ -167,12 +172,17 @@ class Exercise:
         for ind in to_change_index:
             to_change[tokens[ind]] = f'[{lemmas[ind]}]'
 
-        text = self.processed_text.get_raw_text()
-
         for old, new in to_change.items():
             text = text.replace(old, new, 1)
 
         self.fifth_ex = text
+
+    def find_collocations(self):
+        """
+        выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?)
+        :return:
+        """
+        
 
 
 class FinalFiles:
