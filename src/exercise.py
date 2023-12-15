@@ -3,12 +3,13 @@ import random
 from constants import punctuation, ASSETS_PATH
 from navec import Navec
 from nltk.tokenize import sent_tokenize
+import nltk.text
 from pathlib import Path
 from pymorphy2 import MorphAnalyzer
 import os.path
 
 
-class TextProcessor:
+class SentProcessor:
     """
     Предобрабатывает исходный текст:
     разбивает на токены, находит начальные формы, морфологические признаки и векторы.
@@ -20,7 +21,6 @@ class TextProcessor:
         self._morph_analyzer = MorphAnalyzer()
         self._morph = None
         self._vector = {}
-        self._sentences = []
 
     def _tokenise_text(self, text: str) -> None:
         """
@@ -61,13 +61,6 @@ class TextProcessor:
             else:
                 self._vector[token] = None
 
-    def _split_to_sentences(self):
-        """
-        Разбивает исходный текст на предложения, сохраняя исходное форматирование
-        :return: None
-        """
-        self._sentences = sent_tokenize(self._raw_text)
-
     def process_text(self):
         """
         Выполняет предобработку текста.
@@ -77,7 +70,6 @@ class TextProcessor:
         self._lemmatise_text()
         self._morph_text()
         self._vectorize_text()
-        self._split_to_sentences()
 
     def get_raw_text(self):
         """
@@ -100,13 +92,6 @@ class TextProcessor:
         """
         return self._morph
 
-    def get_sentences(self):
-        """
-        возвращает список предложений с исходным форматирвоанием
-        :return: list
-        """
-        return self._sentences
-
     def get_tokens(self):
         """
         возвращает токены
@@ -123,7 +108,7 @@ class TextProcessor:
 
 
 class Exercise:
-    def __init__(self, processed_text: TextProcessor):
+    def __init__(self, processed_text: list):
         """
         идеи для упражнений:
         1. синонимы - Соня
@@ -153,36 +138,48 @@ class Exercise:
         выбрать правильную форму слова
         :return:
         """
-        sentences = random.sample(self.processed_text.get_sentences(), 5)
-        text = '\n'.join(sentences)
-        self.fifth_answers = text
-        morphs = self.processed_text.get_morph()
-        tokens = self.processed_text.get_tokens()
-        lemmas = self.processed_text.get_lemmas()
-        possible_change = []
+        sentences = random.sample(self.processed_text, 5)
+        full_text = ''
+        text = ''
 
-        for i in range(len(tokens)):
-            if ('NOUN' in str(morphs[i])) or ('VERB' in str(morphs[i])):
-                if tokens[i] in text:
+        for sent in sentences:
+            sent_text = sent.get_raw_text()
+            full_text += sent_text
+            morphs = sent.get_morph()
+            tokens = sent.get_tokens()
+            lemmas = sent.get_lemmas()
+            possible_change = []
+
+            for i in range(len(tokens)):
+                if ('NOUN' in str(morphs[i])) or ('VERB' in str(morphs[i])):
                     possible_change.append(i)
 
-        to_change_index = random.sample(possible_change, 10)
-        to_change = {}
+            to_change_index = random.sample(possible_change, 3)
+            to_change = {}
 
-        for ind in to_change_index:
-            to_change[tokens[ind]] = f'[{lemmas[ind]}]'
+            for ind in to_change_index:
+                to_change[tokens[ind]] = f'[{lemmas[ind]}]'
 
-        for old, new in to_change.items():
-            text = text.replace(old, new, 1)
+            for old, new in to_change.items():
+                sent_text = sent_text.replace(old, new, 1)
+            text += sent_text + '\n'
 
         self.fifth_ex = text
+        self.fifth_answers = full_text
 
     def find_collocations(self):
         """
         выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?)
         :return:
         """
-        
+        sentences = random.sample(self.processed_text.get_sentences(), 3)
+        text = '\n'.join(sentences)
+        tokens = self.processed_text.get_tokens()
+        vectors = self.processed_text.get_vectors()
+        lemmas = self.processed_text.get_lemmas()
+        for token in tokens:
+            if token in text:
+                print(token)
 
 
 class FinalFiles:

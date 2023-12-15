@@ -1,19 +1,23 @@
-from exercise import TextProcessor, Exercise
+from exercise import SentProcessor, Exercise
 import os.path
+from nltk.tokenize import sent_tokenize
 
 if __name__ == '__main__':
     with open(os.path.dirname(__file__) + '/../text_file.txt', encoding='utf-8') as file:
         text = file.read()
-    processor = TextProcessor(text)
-    processor.process_text()
-    #print("Sentences:", ex1.get_sentences())
-    #print("Lemmas:", ex1.get_lemmas())
-    #print("Morphological Features:", ex1.get_morph())
-    morphs = processor.get_morph()
 
-    exercise = Exercise(processor)
+    sentences = sent_tokenize(text)
+    processed_sentences = []
+    for sent in sentences:
+        processed_sent = SentProcessor(sent)
+        processed_sent.process_text()
+        processed_sentences.append(processed_sent)
+
+    exercise = Exercise(processed_sentences)
     exercise.select_grammatical_form()
     print(exercise.fifth_ex)
+    #exercise.find_collocations()
+
 
 
     
