@@ -17,6 +17,9 @@ if __name__ == '__main__':
     exercise.select_grammatical_form()
     print(exercise.fifth_ex, '\n', exercise.fifth_answers)
 
+    exercise.find_collocations()
+    print(exercise.sixth_ex, '\n', exercise.sixth_answers)
+
 
 
     

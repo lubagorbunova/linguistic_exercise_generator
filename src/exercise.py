@@ -1,6 +1,7 @@
 import random
+import re
 
-from src.constants import punctuation, ASSETS_PATH
+from src.constants import punctuation, ASSETS_PATH, most_frequent_nouns
 from navec import Navec
 from nltk.tokenize import sent_tokenize
 import nltk.text
@@ -8,6 +9,12 @@ from pathlib import Path
 from pymorphy2 import MorphAnalyzer
 import os.path
 from typing import List
+from numpy import dot
+from numpy.linalg import norm
+import heapq
+
+path = os.path.dirname(__file__) + '/../navec_hudlit_v1_12B_500K_300d_100q.tar'
+navec = Navec.load(path)
 
 class SentProcessor:
     """
@@ -53,13 +60,11 @@ class SentProcessor:
         находит векторы для каждого токена. Пары токен-вектор хранятся в словаре
         :return: None
         """
-        path = os.path.dirname(__file__) + '/../navec_hudlit_v1_12B_500K_300d_100q.tar'
-        navec = Navec.load(path)
-        for token in self._tokens:
-            if token in navec.vocab:
-                self._vector[token] = navec[token]
+        for lemma in self._lemma_text:
+            if lemma in navec.vocab:
+                self._vector[lemma] = navec[lemma]
             else:
-                self._vector[token] = None
+                self._vector[lemma] = navec['<pad>']
 
     def process_text(self):
         """
@@ -145,7 +150,7 @@ class Exercise:
 
         for sent in sentences:
             sent_text = sent.get_raw_text()
-            full_text += sent_text
+            full_text += sent_text + '\n'
             morphs = sent.get_morph()
             tokens = sent.get_tokens()
             lemmas = sent.get_lemmas()
@@ -162,7 +167,9 @@ class Exercise:
                 to_change[tokens[ind]] = f'_____ [{lemmas[ind]}]'
 
             for old, new in to_change.items():
-                sent_text = sent_text.replace(old, new, 1)
+                pattern = re.compile(old, re.IGNORECASE)
+                sent_text = pattern.sub(new, sent_text)
+
             text += sent_text + '\n'
 
         self.fifth_ex = text
@@ -179,25 +186,40 @@ class Exercise:
 
         for sent in sentences:
             sent_text = sent.get_raw_text()
-            full_text += sent_text
+            full_text += '\n' + sent_text
             vectors = sent.get_vectors()
             tokens = sent.get_tokens()
             lemmas = sent.get_lemmas()
             morphs = sent.get_morph()
-            possible_change = []
+            possible_change = {}
 
             for i in range(len(tokens)):
                 if 'NOUN' in str(morphs[i]):
-                    possible_change.append(i)
+                    possible_change[tokens[i]] = lemmas[i]
 
-            to_change_index = random.sample(possible_change, 3)
-            to_change = {}
+            change_token = random.sample(possible_change.keys(), 1)[0]
+            change_lemma = possible_change[change_token]
+            change_vector = vectors[change_lemma]
 
-            for ind in to_change_index:
-                to_change[tokens[ind]] = f'_____ [{vectors[ind]}]'
+            other_nouns = {}
 
-            for old, new in to_change.items():
-                sent_text = sent_text.replace(old, new, 1)
+            for noun in most_frequent_nouns:
+                other_vector = navec[noun]
+                cosine = dot(change_vector, other_vector)
+                other_nouns[cosine]=noun
+            other_keys = heapq.nlargest(5, other_nouns.keys())
+
+            new = []
+            for key in other_keys:
+                most_similar_noun = other_nouns[key]
+                new.append(most_similar_noun)
+            if change_lemma not in new:
+                new.append(change_lemma)
+            random.shuffle(new)
+            answers = ', '.join(new)
+
+            pattern = re.compile(change_token, re.IGNORECASE)
+            sent_text = pattern.sub(f'_____[{answers}]', sent_text)
             text += sent_text + '\n'
 
         self.sixth_ex = text
