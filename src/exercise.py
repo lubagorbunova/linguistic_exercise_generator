@@ -7,7 +7,7 @@ import nltk.text
 from pathlib import Path
 from pymorphy2 import MorphAnalyzer
 import os.path
-
+from typing import List
 
 class SentProcessor:
     """
@@ -108,7 +108,7 @@ class SentProcessor:
 
 
 class Exercise:
-    def __init__(self, processed_text: list):
+    def __init__(self, processed_text: List[SentProcessor]):
         """
         идеи для упражнений:
         1. синонимы - Соня
@@ -126,6 +126,7 @@ class Exercise:
         self.fifth_ex = ''
         self.fifth_answers = ''
         self.sixth_ex = ''
+        self.sixth_answers = ''
 
     def form_exercises(self):
         '''
@@ -158,7 +159,7 @@ class Exercise:
             to_change = {}
 
             for ind in to_change_index:
-                to_change[tokens[ind]] = f'[{lemmas[ind]}]'
+                to_change[tokens[ind]] = f'_____ [{lemmas[ind]}]'
 
             for old, new in to_change.items():
                 sent_text = sent_text.replace(old, new, 1)
@@ -172,14 +173,35 @@ class Exercise:
         выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?)
         :return:
         """
-        sentences = random.sample(self.processed_text.get_sentences(), 3)
-        text = '\n'.join(sentences)
-        tokens = self.processed_text.get_tokens()
-        vectors = self.processed_text.get_vectors()
-        lemmas = self.processed_text.get_lemmas()
-        for token in tokens:
-            if token in text:
-                print(token)
+        sentences = random.sample(self.processed_text, 5)
+        full_text = ''
+        text = ''
+
+        for sent in sentences:
+            sent_text = sent.get_raw_text()
+            full_text += sent_text
+            vectors = sent.get_vectors()
+            tokens = sent.get_tokens()
+            lemmas = sent.get_lemmas()
+            morphs = sent.get_morph()
+            possible_change = []
+
+            for i in range(len(tokens)):
+                if 'NOUN' in str(morphs[i]):
+                    possible_change.append(i)
+
+            to_change_index = random.sample(possible_change, 3)
+            to_change = {}
+
+            for ind in to_change_index:
+                to_change[tokens[ind]] = f'_____ [{vectors[ind]}]'
+
+            for old, new in to_change.items():
+                sent_text = sent_text.replace(old, new, 1)
+            text += sent_text + '\n'
+
+        self.sixth_ex = text
+        self.sixth_answers = full_text
 
 
 class FinalFiles:

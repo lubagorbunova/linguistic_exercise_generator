@@ -15,8 +15,7 @@ if __name__ == '__main__':
 
     exercise = Exercise(processed_sentences)
     exercise.select_grammatical_form()
-    print(exercise.fifth_ex)
-    #exercise.find_collocations()
+    print(exercise.fifth_ex, '\n', exercise.fifth_answers)
 
 
 
