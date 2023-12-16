@@ -1,13 +1,13 @@
-import random
-
-from src.constants import punctuation, ASSETS_PATH
+from constants import punctuation, ASSETS_PATH
 from navec import Navec
-from nltk.tokenize import sent_tokenize
-import nltk.text
 from pathlib import Path
 from pymorphy2 import MorphAnalyzer
-import os.path
 from typing import List
+from word import Word
+
+import os.path
+import random
+
 
 class SentProcessor:
     """
@@ -17,19 +17,19 @@ class SentProcessor:
     def __init__(self, text: str):
         self._raw_text = text
         self._lemma_text = None
-        self._tokens = []
+        self._tokens = None
         self._morph_analyzer = MorphAnalyzer()
         self._morph = None
         self._vector = {}
 
-    def _tokenise_text(self, text: str) -> None:
+    def _tokenise_text(self) -> None:
         """
         Очищает текст от знаков препинания, приводит к нижнему регистру, разбивает на токены
         return: None
         """
         for el in punctuation:
-            text = text.replace(el, ' ')
-        self._tokens = tuple(text.lower().split())
+            self._raw_text = self._raw_text.replace(el, ' ')
+        self._tokens = self._raw_text.lower().split()
 
     def _lemmatise_text(self):
         """
@@ -66,7 +66,7 @@ class SentProcessor:
         Выполняет предобработку текста.
         :return: None
         """
-        self._tokenise_text(self.get_raw_text())
+        self._tokenise_text()
         self._lemmatise_text()
         self._morph_text()
         self._vectorize_text()
@@ -119,8 +119,11 @@ class Exercise:
         6. выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?) - Люба
         """
         self.processed_text = processed_text
-        self.first_ex = '' #функции упражнений записывают строки в атрибуты
+        # функции упражнений записывают строки в атрибуты
+        self.first_ex = ''
+        self.first_answers = ''
         self.second_ex = ''
+        self.second_answers = ''
         self.third_ex = ''
         self.fourth_ex = ''
         self.fifth_ex = ''
@@ -133,6 +136,74 @@ class Exercise:
         объединяет все упражнения в один файл
         :return:
         '''
+
+        self.syn_ant_exercise('synonym')
+        self.syn_ant_exercise('antonym')
+
+    def syn_ant_exercise(self, task_type: str):
+        sentence = random.choice(self.processed_text)
+        lemmas = sentence.get_lemmas()
+        synonyms = {}
+        antonyms = {}
+        for i, lemma in enumerate(lemmas):
+            word = Word(lemma, i)
+            word.fill_sets()
+            if len(word.get_synonyms()) >= 1:
+                synonyms[i] = word.get_synonyms()
+            if len(word.get_antonyms()) >= 1:
+                antonyms[i] = word.get_antonyms()
+        new_sentence = sentence.get_tokens()
+
+        if task_type == 'synonym':
+            if len(synonyms) == 0:
+                self.first_ex = 'NO TASK WITH SYNONYMS'
+            target_word, correct, synonym_task, = self._get_options(synonyms, lemmas)
+            new_sentence[target_word] = new_sentence[target_word].upper()
+            self.first_ex = f"""Выберите синоним к выделенному слову: \n
+    {' '.join(new_sentence)} \n
+    {synonym_task}"""
+
+        if task_type == 'antonym':
+            if len(antonyms) == 0:
+                self.second_ex = 'NO TASK WITH ANTONYMS'
+            target_word, correct, antonym_task = self._get_options(antonyms, lemmas)
+            new_sentence[target_word] = new_sentence[target_word].upper()
+            self.second_ex = f"""Выберите антоним к выделенному слову: \n
+    {' '.join(new_sentence)} \n
+    {antonym_task}"""
+            self.second_answers = correct
+
+    def _get_options(self, thesaurus: dict, lemmas: list[str]):
+        answer = ''
+        word_id = 0
+        num_words = 0
+        while num_words <= 1:
+            word_id = random.choice(list(thesaurus.keys()))
+            limit = random.randint(0, len(thesaurus[word_id]) - 1)
+            answer = random.sample(list(thesaurus[word_id]), 1)[random.randint(0, limit)]
+            if answer == lemmas[word_id]:
+                num_words = 0
+            else:
+                num_words = len(thesaurus[word_id])
+        options = []
+        for i in list(thesaurus.values()):
+            options.extend(i)
+        task_choices = set(random.sample(options, 3))
+        if answer not in task_choices:
+            task_choices.add(answer)
+        elif lemmas[word_id] in task_choices:
+            task_choices.discard(lemmas[word_id])
+        else:
+            while len(task_choices) != 4:
+                task_choices.add(random.choice(options))
+        final_choices = list(task_choices)
+        correct = final_choices.index(answer) + 1
+        task = f"""Варианты:\n 
+            1 - {final_choices[0].upper()} \n 
+            2 - {final_choices[1].upper()} \n 
+            3 - {final_choices[2].upper()} \n 
+            4 - {final_choices[3].upper()}"""
+        return word_id, correct, task
 
     def select_grammatical_form(self):
         """

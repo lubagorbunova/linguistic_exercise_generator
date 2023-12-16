@@ -13,6 +13,8 @@ pylint = "^3.0.2"
 gensim = "^4.3.2"
 navec = "^0.10.0"
 pymorphy2= "^0.9.1"
+ruwordnet = "^0.0.6"
+wiki-ru-wordnet = "^1.0.3"
 
 
 [build-system]

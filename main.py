@@ -1,5 +1,4 @@
 from src.exercise import SentProcessor, Exercise
-import os.path
 from nltk.tokenize import sent_tokenize
 
 if __name__ == '__main__':
@@ -16,7 +15,6 @@ if __name__ == '__main__':
     exercise = Exercise(processed_sentences)
     exercise.select_grammatical_form()
     print(exercise.fifth_ex, '\n', exercise.fifth_answers)
-
-
-
-    
+    exercise.form_exercises()
+    print(exercise.first_ex, '\n', exercise.first_answers)
+    print(exercise.second_ex, '\n', exercise.second_answers)
