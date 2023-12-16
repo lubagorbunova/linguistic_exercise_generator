@@ -6,7 +6,7 @@ from pathlib import Path
 from pymorphy2 import MorphAnalyzer
 from typing import List
 from numpy import dot
-from word import Word
+from src.word import Word
 from numpy.linalg import norm
 import heapq
 
