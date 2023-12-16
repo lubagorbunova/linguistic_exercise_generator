@@ -1,9 +1,9 @@
-from constants import punctuation, ASSETS_PATH
+from src.constants import punctuation, ASSETS_PATH
 from navec import Navec
 from pathlib import Path
 from pymorphy2 import MorphAnalyzer
 from typing import List
-from word import Word
+from src.word import Word
 
 import os.path
 import random
@@ -141,6 +141,7 @@ class Exercise:
         self.syn_ant_exercise('antonym')
 
     def syn_ant_exercise(self, task_type: str):
+        """Делает задание на синонимы/антонимы"""
         sentence = random.choice(self.processed_text)
         lemmas = sentence.get_lemmas()
         synonyms = {}
@@ -157,8 +158,10 @@ class Exercise:
         if task_type == 'synonym':
             if len(synonyms) == 0:
                 self.first_ex = 'NO TASK WITH SYNONYMS'
+                return
             target_word, correct, synonym_task, = self._get_options(synonyms, lemmas)
             new_sentence[target_word] = new_sentence[target_word].upper()
+            self.first_answers = correct
             self.first_ex = f"""Выберите синоним к выделенному слову: \n
     {' '.join(new_sentence)} \n
     {synonym_task}"""
@@ -166,21 +169,25 @@ class Exercise:
         if task_type == 'antonym':
             if len(antonyms) == 0:
                 self.second_ex = 'NO TASK WITH ANTONYMS'
+                return
             target_word, correct, antonym_task = self._get_options(antonyms, lemmas)
             new_sentence[target_word] = new_sentence[target_word].upper()
+            self.second_answers = correct
             self.second_ex = f"""Выберите антоним к выделенному слову: \n
     {' '.join(new_sentence)} \n
     {antonym_task}"""
-            self.second_answers = correct
 
     def _get_options(self, thesaurus: dict, lemmas: list[str]):
+        """
+        создает список вариантов, номер правильного ответа
+        """
+        #надо подумать над элс..мне чет не нравится
         answer = ''
         word_id = 0
         num_words = 0
         while num_words <= 1:
             word_id = random.choice(list(thesaurus.keys()))
-            limit = random.randint(0, len(thesaurus[word_id]) - 1)
-            answer = random.sample(list(thesaurus[word_id]), 1)[random.randint(0, limit)]
+            answer = random.sample(list(thesaurus[word_id]), 1)[0]
             if answer == lemmas[word_id]:
                 num_words = 0
             else:
@@ -188,21 +195,26 @@ class Exercise:
         options = []
         for i in list(thesaurus.values()):
             options.extend(i)
-        task_choices = set(random.sample(options, 3))
-        if answer not in task_choices:
-            task_choices.add(answer)
-        elif lemmas[word_id] in task_choices:
-            task_choices.discard(lemmas[word_id])
-        else:
+        if len(set(options)) > 4:
+            task_choices = set(random.sample(options, 3))
             while len(task_choices) != 4:
+                if lemmas[word_id] in task_choices:
+                    task_choices.discard(lemmas[word_id])
+                if answer not in task_choices:
+                    task_choices.add(answer)
                 task_choices.add(random.choice(options))
-        final_choices = list(task_choices)
-        correct = final_choices.index(answer) + 1
-        task = f"""Варианты:\n 
-            1 - {final_choices[0].upper()} \n 
-            2 - {final_choices[1].upper()} \n 
-            3 - {final_choices[2].upper()} \n 
-            4 - {final_choices[3].upper()}"""
+            final_choices = list(task_choices)
+            correct = final_choices.index(answer) + 1
+            task = f"""Варианты:\n 
+                1 - {final_choices[0].upper()} \n 
+                2 - {final_choices[1].upper()} \n 
+                3 - {final_choices[2].upper()} \n 
+                4 - {final_choices[3].upper()}"""
+        else:
+            correct = options.index(answer) + 1
+            task = f"""Варианты:\n 
+                1 - {options[0].upper()} \n 
+                2 - {options[1].upper()} \n """
         return word_id, correct, task
 
     def select_grammatical_form(self):
