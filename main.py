@@ -1,13 +1,30 @@
-from exercise import TextProcessor
+from src.exercise import SentProcessor, Exercise
+import os.path
+from nltk.tokenize import sent_tokenize
 
 if __name__ == '__main__':
-    ex1 = TextProcessor(
-        'Зовут его Николаем Петровичем Кирсановым. У него в пятнадцати верстах от постоялого дворика хорошее имение в двести душ, или, как он выражается с тех пор, как размежевался с крестьянами и завел «ферму», — в две тысячи десятин земли. Отец его, боевой генерал 1812 года, полуграмотный, грубый, но не злой русский человек, всю жизнь свою тянул лямку, командовал сперва бригадой, потом дивизией и постоянно жил в провинции, где в силу своего чина играл довольно значительную роль.')
-    ex1.split_to_sentences()
-    ex1.lemmatise_text()
-    ex1.morph_text()
+    with open('text_file.txt', encoding='utf-8') as file:
+        text = file.read()
 
-    print("Sentences:", ex1.get_sentences())
-    print("Lemmas:", ex1.get_lemmas())
-    print("Morphological Features:", ex1.get_morph())
+    sentences = sent_tokenize(text)
+    processed_sentences = []
+    for sent in sentences:
+        processed_sent = SentProcessor(sent)
+        processed_sent.process_text()
+        processed_sentences.append(processed_sent)
+
+    exercise = Exercise(processed_sentences)
+    #exercise.select_grammatical_form()
+    #print(exercise.fifth_ex, '\n', exercise.fifth_answers)
+
+    # Вызов метода generate_scrambled_sentence
+    exercise.generate_scrambled_sentence()
+    print(exercise.third_ex, '\n', exercise.third_answers)
+
+    exercise.generate_case_exercise()
+    print(exercise.fourth_ex, '\n', exercise.fourth_answers)
+
+
+
+
     
