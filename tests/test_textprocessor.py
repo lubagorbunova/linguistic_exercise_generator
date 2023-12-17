@@ -11,4 +11,4 @@ class SentProcessorBaseTests(unittest.TestCase):
     def test_tokenise(self):
         instance = SentProcessor('Кошка спит на диване!')
         instance.process_text()
-        self.assertEqual(instance.get_tokens(), ('кошка', 'спит', 'на', 'диване'))
+        self.assertEqual(instance.get_tokens(), ['кошка', 'спит', 'на', 'диване'])

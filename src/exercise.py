@@ -125,6 +125,7 @@ class Exercise:
         5. выбрать правильную форму слова - Люба
         6. выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?) - Люба
         """
+        self._morph_analyzer = MorphAnalyzer()
         self.processed_text = processed_text
         # функции упражнений записывают строки в атрибуты
         self.first_ex = ''
@@ -223,6 +224,63 @@ class Exercise:
                 1 - {options[0].upper()} \n 
                 2 - {options[1].upper()} \n """
         return word_id, correct, task
+
+    def generate_scrambled_sentence(self):
+        sentence = random.choice(self.processed_text)  # Выбираем случайное предложение из обработанного текста
+        lemmas = sentence.get_lemmas()
+        random.shuffle(lemmas)
+
+        lemmatized_tokens = ', '.join(f'[{lemma}]' for lemma in lemmas)
+
+        exercise_task = f"Составьте предложение из слов и поставьте их в правильную форму:\n{lemmatized_tokens}"
+
+        full_text = sentence.get_raw_text()
+
+        self.third_ex = exercise_task
+        self.third_answers = full_text
+
+    def generate_case_exercise(self):
+        sentence = random.choice(self.processed_text)
+        tokens = list(sentence.get_tokens())
+
+        candidates = [word for word in tokens if 'NOUN' in self._morph_analyzer.parse(word)[0].tag]
+
+        if not candidates:
+            return "В данном предложении нет существительных."
+
+        random.shuffle(tokens)
+
+        word_to_change = random.choice(candidates)
+        word_to_change1 = word_to_change.upper()
+
+        raw_sentence = sentence.get_raw_text()
+
+        # Словарь для соответствия аббревиатур падежей и их русских названий
+        cases_dict = {
+            'nomn': 'Именительный',
+            'gent': 'Родительный',
+            'datv': 'Дательный',
+            'accs': 'Винительный',
+            'ablt': 'Творительный',
+            'loct': 'Предложный'
+        }
+
+        correct_case_abbr = self._morph_analyzer.parse(word_to_change)[0].tag.case
+        correct_case = cases_dict.get(correct_case_abbr)
+
+        exercise_task = f"Задание №4: Выберите правильный падеж для слова '{word_to_change1}' в предложении '{raw_sentence}':\n"
+
+        exercise_task += f"1. {cases_dict['nomn']}\n"
+        exercise_task += f"2. {cases_dict['gent']}\n"
+        exercise_task += f"3. {cases_dict['datv']}\n"
+        exercise_task += f"4. {cases_dict['accs']}\n"
+        exercise_task += f"5. {cases_dict['ablt']}\n"
+        exercise_task += f"6. {cases_dict['loct']}"
+
+        full_text = f"Правильный ответ: {correct_case}"
+
+        self.fourth_ex = exercise_task
+        self.fourth_answers = full_text
 
     def select_grammatical_form(self):
         """
