@@ -10,13 +10,9 @@ from numpy import dot
 from src.word import Word
 from numpy.linalg import norm
 import heapq
-
 import os.path
 import random
 
-
-path = os.path.dirname(__file__) + '/../navec_hudlit_v1_12B_500K_300d_100q.tar'
-navec = Navec.load(path)
 
 class SentProcessor:
     """
@@ -62,6 +58,8 @@ class SentProcessor:
         находит векторы для каждого токена. Пары токен-вектор хранятся в словаре
         :return: None
         """
+        path = os.path.dirname(__file__) + '/../navec_hudlit_v1_12B_500K_300d_100q.tar'
+        navec = Navec.load(path)
         for lemma in self._lemma_text:
             if lemma in navec.vocab:
                 self._vector[lemma] = navec[lemma]
@@ -326,6 +324,8 @@ class Exercise:
         sentences = random.sample(self.processed_text, 5)
         full_text = ''
         text = ''
+        path = os.path.dirname(__file__) + '/../navec_hudlit_v1_12B_500K_300d_100q.tar'
+        navec = Navec.load(path)
 
         for sent in sentences:
             sent_text = sent.get_raw_text()
