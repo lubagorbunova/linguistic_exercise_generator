@@ -56,6 +56,16 @@ class ExerciseBaseTests(unittest.TestCase):
         self.assertEqual(ex.fifth_ex , '_____ [кошка] _____ [спать].\n')
         self.assertEqual(ex.fifth_answers, 'Кошка спит.\n')
 
+    def test_find_collocations(self):
+        sents = []
+        sent = SentProcessor('Кошка спит.')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents)
+        ex.find_collocations(1)
+        self.assertEqual(ex.sixth_ex, '_____[девочка, животное, кошка, птица, рыба, собака] спит.\n')
+        self.assertEqual(ex.sixth_answers, '\nКошка спит.')
+
     def test_antonyms(self):
         word = Word('холодный', 0)
         word.extract_synonyms_antonyms('холодный')

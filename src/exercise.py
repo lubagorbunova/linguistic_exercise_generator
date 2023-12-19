@@ -322,12 +322,12 @@ class Exercise:
         self.fifth_ex = text
         self.fifth_answers = full_text
 
-    def find_collocations(self):
+    def find_collocations(self, number_sent):
         """
         выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?)
         :return:
         """
-        sentences = random.sample(self.processed_text, 5)
+        sentences = random.sample(self.processed_text, number_sent)
         full_text = ''
         text = ''
         path = os.path.dirname(__file__) + '/../navec_hudlit_v1_12B_500K_300d_100q.tar'
@@ -364,7 +364,7 @@ class Exercise:
                 new.append(most_similar_noun)
             if change_lemma not in new:
                 new.append(change_lemma)
-            random.shuffle(new)
+            new = sorted(new)
             answers = ', '.join(new)
 
             pattern = re.compile(change_token, re.IGNORECASE)
