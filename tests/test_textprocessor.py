@@ -1,5 +1,6 @@
+from src.exercise import SentProcessor, Exercise
+from src.word import Word
 import unittest
-from src.exercise import SentProcessor
 
 
 class SentProcessorBaseTests(unittest.TestCase):
@@ -12,3 +13,21 @@ class SentProcessorBaseTests(unittest.TestCase):
         instance = SentProcessor('Кошка спит на диване!')
         instance.process_text()
         self.assertEqual(instance.get_tokens(), ['кошка', 'спит', 'на', 'диване'])
+
+    def test_antonyms(self):
+        word = Word('холодный', 0)
+        word. extract_synonyms_antonyms('холодный')
+        correct = {'нехолодный', 'теплый по цвету', 'теплый'}
+        if all(correct) in word.get_antonyms:
+            test_value = True
+        msg = 'Something is wrong'
+        self.assertTrue(test_value, msg)
+
+    def test_synonyms(self):
+        word = Word('холодный', 0)
+        word.extract_synonyms_antonyms('холодный')
+        correct = {'ледяной', 'студёный', 'холодный'}
+        if all(correct) in word.get_synonyms:
+            test_value = True
+        msg = 'Something is wrong'
+        self.assertTrue(test_value, msg)
