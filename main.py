@@ -13,7 +13,7 @@ if __name__ == '__main__':
         processed_sentences.append(processed_sent)
 
     exercise = Exercise(processed_sentences)
-    exercise.select_grammatical_form()
+    exercise.select_grammatical_form(5)
     print(exercise.fifth_ex, '\n', exercise.fifth_answers)
     exercise.find_collocations()
     print(exercise.sixth_ex, '\n', exercise.sixth_answers) 

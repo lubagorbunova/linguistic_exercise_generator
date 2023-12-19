@@ -32,9 +32,10 @@ class SentProcessor:
         Очищает текст от знаков препинания, приводит к нижнему регистру, разбивает на токены
         return: None
         """
+        raw_text = self._raw_text
         for el in punctuation:
-            self._raw_text = self._raw_text.replace(el, ' ')
-        self._tokens = self._raw_text.lower().split()
+            raw_text = raw_text.replace(el, ' ')
+        self._tokens = raw_text.lower().split()
 
     def _lemmatise_text(self):
         """
@@ -280,12 +281,12 @@ class Exercise:
         self.fourth_ex = exercise_task
         self.fourth_answers = full_text
 
-    def select_grammatical_form(self):
+    def select_grammatical_form(self, number_of_sent):
         """
         выбрать правильную форму слова
         :return:
         """
-        sentences = random.sample(self.processed_text, 5)
+        sentences = random.sample(self.processed_text, number_of_sent)
         full_text = ''
         text = ''
 
@@ -301,7 +302,12 @@ class Exercise:
                 if ('NOUN' in str(morphs[i])) or ('VERB' in str(morphs[i])):
                     possible_change.append(i)
 
-            to_change_index = random.sample(possible_change, 3)
+            if len(possible_change)>=3:
+                number_gaps = 3
+            else:
+                number_gaps = len(possible_change)
+
+            to_change_index = random.sample(possible_change, number_gaps)
             to_change = {}
 
             for ind in to_change_index:

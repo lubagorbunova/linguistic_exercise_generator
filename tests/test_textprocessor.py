@@ -45,6 +45,17 @@ class SentProcessorBaseTests(unittest.TestCase):
 
 
 class ExerciseBaseTests(unittest.TestCase):
+
+    def test_select_grammatical_form(self):
+        sents = []
+        sent = SentProcessor('Кошка спит.')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents)
+        ex.select_grammatical_form(1)
+        self.assertEqual(ex.fifth_ex , '_____ [кошка] _____ [спать].\n')
+        self.assertEqual(ex.fifth_answers, 'Кошка спит.\n')
+
     def test_antonyms(self):
         word = Word('холодный', 0)
         word.extract_synonyms_antonyms('холодный')
