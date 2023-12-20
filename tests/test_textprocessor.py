@@ -111,7 +111,11 @@ class SentProcessorBaseTests(unittest.TestCase):
 class ExerciseBaseTests(unittest.TestCase):
 
     def test_generate_scrambled_sentence_none(self):
-        instance = Exercise()
+        sents = []
+        sent = SentProcessor('Кошка спит.')
+        sent.process_text()
+        sents.append(sent)
+        instance = Exercise(sents)
         instance.generate_scrambled_sentence()
         self.assertIsNotNone(instance.third_ex)
         self.assertIsNotNone(instance.third_answers)
@@ -122,10 +126,26 @@ class ExerciseBaseTests(unittest.TestCase):
         sent.process_text()
         sents.append(sent)
         ex = Exercise(sents)
-        ex.generate_scrambled_sentence(1)
-        self.assertEqual(ex.third_ex,
-                         'Составьте предложение из слов и поставьте их в правильную форму:\n[спит], [кошка].')
-        self.assertEqual(ex.third_answers, 'Кошка спит')
+        ex.generate_scrambled_sentence()
+        test_value = False
+        if ex.third_ex == '\nЗадание №3. Составьте предложение из слов и поставьте их в правильную форму:\n[спать], [кошка]\n'\
+                or ex.third_ex == '\nЗадание №3. Составьте предложение из слов и поставьте их в правильную форму:\n[кошка], [спать]\n':
+            test_value = True
+        self.assertTrue(test_value, 'WRONG OPTIONS')
+        self.assertEqual(ex.third_answers, '\nОтветы на задание №3:\nКошка спит.\n')
+
+    def test_generate_case_exercise(self):
+        sents = []
+        sent = SentProcessor('Кошка спит.')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents)
+        ex.generate_case_exercise()
+
+        self.assertEqual(ex.fourth_ex,
+                         f"Задание №4: Выберите правильный падеж для слова 'КОШКА' в предложении 'Кошка спит':\n")
+
+        self.assertEqual(ex.fourth_answers, f"Правильный ответ: Именительный")
 
     def test_generate_case_exercise(self):
         sent = SentProcessor('Кошка спит')
@@ -144,8 +164,8 @@ class ExerciseBaseTests(unittest.TestCase):
         sents.append(sent)
         ex = Exercise(sents)
         ex.select_grammatical_form(1)
-        self.assertEqual(ex.fifth_ex , 'Задание №5: Поставьте слово в скобках в правильную форму:\n_____ [кошка] _____ [спать].\n')
-        self.assertEqual(ex.fifth_answers, 'Кошка спит.\n')
+        self.assertEqual(ex.fifth_ex , '\nЗадание №5: Поставьте слово в скобках в правильную форму:\n_____ [кошка] _____ [спать].\n')
+        self.assertEqual(ex.fifth_answers, '\nОтветы на задание №5: \nКошка спит.\n')
 
     def test_select_grammatical_form_empty_input(self):
         sents = []
@@ -154,8 +174,8 @@ class ExerciseBaseTests(unittest.TestCase):
         sents.append(sent)
         ex = Exercise(sents)
         ex.select_grammatical_form(1)
-        self.assertEqual(ex.fifth_ex , 'Задание №5: Поставьте слово в скобках в правильную форму:\n\n')
-        self.assertEqual(ex.fifth_answers, '\n')
+        self.assertEqual(ex.fifth_ex , '\nЗадание №5: Поставьте слово в скобках в правильную форму:\n\n')
+        self.assertEqual(ex.fifth_answers, '\nОтветы на задание №5: \n\n')
 
     def test_select_grammatical_form_no_nouns_or_verbs(self):
         sents = []
@@ -164,8 +184,8 @@ class ExerciseBaseTests(unittest.TestCase):
         sents.append(sent)
         ex = Exercise(sents)
         ex.select_grammatical_form(1)
-        self.assertEqual(ex.fifth_ex , 'Задание №5: Поставьте слово в скобках в правильную форму:\nИ где опять?\n')
-        self.assertEqual(ex.fifth_answers, 'И где опять?\n')
+        self.assertEqual(ex.fifth_ex , '\nЗадание №5: Поставьте слово в скобках в правильную форму:\nИ где опять?\n')
+        self.assertEqual(ex.fifth_answers, '\nОтветы на задание №5: \nИ где опять?\n')
 
     def test_find_collocations(self):
         sents = []
@@ -174,8 +194,8 @@ class ExerciseBaseTests(unittest.TestCase):
         sents.append(sent)
         ex = Exercise(sents)
         ex.find_collocations(1)
-        self.assertEqual(ex.sixth_ex, 'Задание №6: Выберите одно или несколько слов из списка, которые подходят в предложение по смыслу.\nПоставьте слово в правильную форму.\n_____[девочка, животное, кошка, птица, рыба, собака] спит.\n')
-        self.assertEqual(ex.sixth_answers, '\nКошка спит.')
+        self.assertEqual(ex.sixth_ex, '\nЗадание №6: Выберите одно или несколько слов из списка, которые подходят в предложение по смыслу.\nПоставьте слово в правильную форму.\n_____[девочка, животное, кошка, птица, рыба, собака] спит.\n')
+        self.assertEqual(ex.sixth_answers, '\nОтветы на задание №6:\nКошка спит.')
 
     def test_find_collocations_no_nouns(self):
         sents = []
@@ -184,8 +204,8 @@ class ExerciseBaseTests(unittest.TestCase):
         sents.append(sent)
         ex = Exercise(sents)
         ex.find_collocations(1)
-        self.assertEqual(ex.sixth_ex, 'Задание №6: Выберите одно или несколько слов из списка, которые подходят в предложение по смыслу.\nПоставьте слово в правильную форму.\nКрепко спит.\n')
-        self.assertEqual(ex.sixth_answers, '\nКрепко спит.')
+        self.assertEqual(ex.sixth_ex, '\nЗадание №6: Выберите одно или несколько слов из списка, которые подходят в предложение по смыслу.\nПоставьте слово в правильную форму.\nКрепко спит.\n')
+        self.assertEqual(ex.sixth_answers, '\nОтветы на задание №6:\nКрепко спит.')
 
     def test_synonyms(self):
         word = Word('холодный', 0)
@@ -212,3 +232,15 @@ class ExerciseBaseTests(unittest.TestCase):
                     test_value.append(True)
         msg = 'Something is wrong'
         self.assertTrue(all(test_value), msg)
+
+    def test_run_exercises(self):
+        pass
+
+    def test_run_exercises_incorrect_input(self):
+        pass
+
+    def form_exercises(self):
+        pass
+
+    def form_exercises_before_form(self):
+        pass

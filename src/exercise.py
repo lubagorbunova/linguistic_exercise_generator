@@ -141,7 +141,7 @@ class Exercise:
         self.sixth_ex = ''
         self.sixth_answers = ''
 
-    def run_exercises(self, ex_list: list):
+    def run_exercises(self, ex_list = [1, 2, 3, 4, 5, 6]):
         """
         запускает скрипт создания всех упражнений
         :return:
@@ -177,7 +177,6 @@ class Exercise:
                          self.fifth_answers +
                          self.sixth_answers)
         return all_exercises, all_answers
-
 
     def syn_ant_exercise(self, task_type: str):
         """Делает задание на синонимы/антонимы"""
