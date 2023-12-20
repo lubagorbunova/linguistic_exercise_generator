@@ -100,22 +100,28 @@ class ExerciseBaseTests(unittest.TestCase):
         self.assertEqual(ex.sixth_ex, '_____[девочка, животное, кошка, птица, рыба, собака] спит.\n')
         self.assertEqual(ex.sixth_answers, '\nКошка спит.')
 
-    def test_antonyms(self):
-        word = Word('холодный', 0)
-        word.extract_synonyms_antonyms('холодный')
-        test_value = False
-        correct = {'нехолодный', 'теплый по цвету', 'теплый'}
-        if all(correct) in word.get_antonyms():
-            test_value = True
-        msg = 'Something is wrong'
-        self.assertTrue(test_value, msg)
-
     def test_synonyms(self):
         word = Word('холодный', 0)
         word.extract_synonyms_antonyms('холодный')
         correct = {'ледяной', 'студёный', 'холодный'}
-        test_value = False
-        if all(correct) in word.get_synonyms():
-            test_value = True
+        res = word.get_synonyms()
+        test_value = []
+        if len(correct) == len(res):
+            for el in correct:
+                if el in res:
+                    test_value.append(True)
         msg = 'Something is wrong'
-        self.assertTrue(test_value, msg)
+        self.assertTrue(all(test_value), msg)
+
+    def test_antonyms(self):
+        word = Word('холодный', 0)
+        word.extract_synonyms_antonyms('холодный')
+        correct = {'нехолодный', 'теплый по цвету', 'теплый'}
+        res = word.get_antonyms()
+        test_value = []
+        if len(correct) == len(res):
+            for el in correct:
+                if el in res:
+                    test_value.append(True)
+        msg = 'Something is wrong'
+        self.assertTrue(all(test_value), msg)
