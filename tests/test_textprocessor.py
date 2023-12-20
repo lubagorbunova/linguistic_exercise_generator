@@ -80,7 +80,7 @@ class SentProcessorBaseTests(unittest.TestCase):
 
 class ExerciseBaseTests(unittest.TestCase):
 
-    def test_select_grammatical_form(self):
+    def test_select_grammatical_form_correct_input(self):
         sents = []
         sent = SentProcessor('Кошка спит.')
         sent.process_text()
@@ -89,6 +89,26 @@ class ExerciseBaseTests(unittest.TestCase):
         ex.select_grammatical_form(1)
         self.assertEqual(ex.fifth_ex , '_____ [кошка] _____ [спать].\n')
         self.assertEqual(ex.fifth_answers, 'Кошка спит.\n')
+
+    def test_select_grammatical_form_empty_input(self):
+        sents = []
+        sent = SentProcessor('')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents)
+        ex.select_grammatical_form(1)
+        self.assertEqual(ex.fifth_ex , '\n')
+        self.assertEqual(ex.fifth_answers, '\n')
+
+    def test_select_grammatical_form_no_nouns_or_verbs(self):
+        sents = []
+        sent = SentProcessor('И где опять?')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents)
+        ex.select_grammatical_form(1)
+        self.assertEqual(ex.fifth_ex , 'И где опять?\n')
+        self.assertEqual(ex.fifth_answers, 'И где опять?\n')
 
     def test_find_collocations(self):
         sents = []
@@ -99,6 +119,16 @@ class ExerciseBaseTests(unittest.TestCase):
         ex.find_collocations(1)
         self.assertEqual(ex.sixth_ex, '_____[девочка, животное, кошка, птица, рыба, собака] спит.\n')
         self.assertEqual(ex.sixth_answers, '\nКошка спит.')
+
+    def test_find_collocations_no_nouns(self):
+        sents = []
+        sent = SentProcessor('Крепко спит.')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents)
+        ex.find_collocations(1)
+        self.assertEqual(ex.sixth_ex, 'Крепко спит.\n')
+        self.assertEqual(ex.sixth_answers, '\nКрепко спит.')
 
     def test_synonyms(self):
         word = Word('холодный', 0)

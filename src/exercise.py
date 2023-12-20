@@ -349,30 +349,33 @@ class Exercise:
                 if 'NOUN' in str(morphs[i]):
                     possible_change[tokens[i]] = lemmas[i]
 
-            change_token = random.sample(possible_change.keys(), 1)[0]
-            change_lemma = possible_change[change_token]
-            change_vector = vectors[change_lemma]
+            if len(possible_change)>0:
+                change_token = random.sample(possible_change.keys(), 1)[0]
+                change_lemma = possible_change[change_token]
+                change_vector = vectors[change_lemma]
 
-            other_nouns = {}
+                other_nouns = {}
 
-            for noun in most_frequent_nouns:
-                other_vector = navec[noun]
-                cosine = dot(change_vector, other_vector)
-                other_nouns[cosine]=noun
-            other_keys = heapq.nlargest(5, other_nouns.keys())
+                for noun in most_frequent_nouns:
+                    other_vector = navec[noun]
+                    cosine = dot(change_vector, other_vector)
+                    other_nouns[cosine]=noun
+                other_keys = heapq.nlargest(5, other_nouns.keys())
 
-            new = []
-            for key in other_keys:
-                most_similar_noun = other_nouns[key]
-                new.append(most_similar_noun)
-            if change_lemma not in new:
-                new.append(change_lemma)
-            new = sorted(new)
-            answers = ', '.join(new)
+                new = []
+                for key in other_keys:
+                    most_similar_noun = other_nouns[key]
+                    new.append(most_similar_noun)
+                if change_lemma not in new:
+                    new.append(change_lemma)
+                new = sorted(new)
+                answers = ', '.join(new)
 
-            pattern = re.compile(change_token, re.IGNORECASE)
-            sent_text = pattern.sub(f'_____[{answers}]', sent_text)
+                pattern = re.compile(change_token, re.IGNORECASE)
+                sent_text = pattern.sub(f'_____[{answers}]', sent_text)
+
             text += sent_text + '\n'
+
 
         self.sixth_ex = text
         self.sixth_answers = full_text
