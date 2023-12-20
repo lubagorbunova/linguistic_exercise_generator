@@ -20,7 +20,10 @@ class SentProcessor:
     разбивает на токены, находит начальные формы, морфологические признаки и векторы.
     """
     def __init__(self, text: str):
-        self._raw_text = text
+        if isinstance(text, str):
+            self._raw_text = text
+        else:
+            self._raw_text = None
         self._lemma_text = None
         self._tokens = None
         self._morph_analyzer = MorphAnalyzer()
