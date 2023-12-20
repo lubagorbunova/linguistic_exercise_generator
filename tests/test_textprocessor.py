@@ -28,6 +28,36 @@ class SentProcessorBaseTests(unittest.TestCase):
         instance.process_text()
         self.assertEqual(instance._tokens, ['кошка', 'спит', 'на', 'диване'])
 
+    def test_lemmas(self):
+        text = 'Кошка спит на диване!'
+        instance = SentProcessor(text)
+        instance.process_text()
+        expected_lemmas = ['кошка', 'спать', 'на', 'диван']
+        self.assertEqual(instance._lemma_text, expected_lemmas)
+
+    def test_lemma_text_empty_after_processing_empty_text(self):
+        empty_text = ''
+        instance = SentProcessor(empty_text)
+        instance.process_text()
+        expected_lemmas = []
+        self.assertEqual(instance._lemma_text, expected_lemmas)
+
+    def test_get_lemmas_unusual_characters(self):
+        text = 'Кошка спит....zzZZzz'
+        instance = SentProcessor(text)
+        instance.process_text()
+        lemmas = instance.get_lemmas()
+        expected_lemmas = ['кошка', 'спать', 'zzzzzz']
+        self.assertEqual(lemmas, expected_lemmas)
+
+    def test_get_lemmas_no_words(self):
+        text = '!@#$%^&*()'
+        instance = SentProcessor(text)
+        instance.process_text()
+        lemmas = instance.get_lemmas()
+        expected_lemmas = []
+        self.assertEqual(lemmas, expected_lemmas)
+
     def test_vectorise(self):
         sentences = ['Кошка', 'stjrdvrdjfvkjy']
         for sent in sentences:
@@ -79,6 +109,33 @@ class SentProcessorBaseTests(unittest.TestCase):
 
 
 class ExerciseBaseTests(unittest.TestCase):
+
+    def test_generate_scrambled_sentence_none(self):
+        instance = Exercise()
+        instance.generate_scrambled_sentence()
+        self.assertIsNotNone(instance.third_ex)
+        self.assertIsNotNone(instance.third_answers)
+
+    def test_generate_scrambled_sentence(self):
+        sents = []
+        sent = SentProcessor('Кошка спит.')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents)
+        ex.generate_scrambled_sentence(1)
+        self.assertEqual(ex.third_ex,
+                         'Составьте предложение из слов и поставьте их в правильную форму:\n[спит], [кошка].')
+        self.assertEqual(ex.third_answers, 'Кошка спит')
+
+    def test_generate_case_exercise(self):
+        sent = SentProcessor('Кошка спит')
+        sent.process_text()
+        sents = []
+        sents.append(sent)
+        instance = Exercise(sents, number_of_sent_in_each_ex=1)
+        instance.generate_case_exercise()
+        self.assertIsNotNone(instance.fourth_ex)
+        self.assertIsNotNone(instance.fourth_answers)
 
     def test_select_grammatical_form_correct_input(self):
         sents = []
