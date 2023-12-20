@@ -87,7 +87,7 @@ class ExerciseBaseTests(unittest.TestCase):
         sents.append(sent)
         ex = Exercise(sents)
         ex.select_grammatical_form(1)
-        self.assertEqual(ex.fifth_ex , '_____ [кошка] _____ [спать].\n')
+        self.assertEqual(ex.fifth_ex , 'Задание №5: Поставьте слово в скобках в правильную форму:\n_____ [кошка] _____ [спать].\n')
         self.assertEqual(ex.fifth_answers, 'Кошка спит.\n')
 
     def test_select_grammatical_form_empty_input(self):
@@ -97,7 +97,7 @@ class ExerciseBaseTests(unittest.TestCase):
         sents.append(sent)
         ex = Exercise(sents)
         ex.select_grammatical_form(1)
-        self.assertEqual(ex.fifth_ex , '\n')
+        self.assertEqual(ex.fifth_ex , 'Задание №5: Поставьте слово в скобках в правильную форму:\n\n')
         self.assertEqual(ex.fifth_answers, '\n')
 
     def test_select_grammatical_form_no_nouns_or_verbs(self):
@@ -107,7 +107,7 @@ class ExerciseBaseTests(unittest.TestCase):
         sents.append(sent)
         ex = Exercise(sents)
         ex.select_grammatical_form(1)
-        self.assertEqual(ex.fifth_ex , 'И где опять?\n')
+        self.assertEqual(ex.fifth_ex , 'Задание №5: Поставьте слово в скобках в правильную форму:\nИ где опять?\n')
         self.assertEqual(ex.fifth_answers, 'И где опять?\n')
 
     def test_find_collocations(self):
@@ -117,7 +117,7 @@ class ExerciseBaseTests(unittest.TestCase):
         sents.append(sent)
         ex = Exercise(sents)
         ex.find_collocations(1)
-        self.assertEqual(ex.sixth_ex, '_____[девочка, животное, кошка, птица, рыба, собака] спит.\n')
+        self.assertEqual(ex.sixth_ex, 'Задание №6: Выберите одно или несколько слов из списка, которые подходят в предложение по смыслу.\nПоставьте слово в правильную форму.\n_____[девочка, животное, кошка, птица, рыба, собака] спит.\n')
         self.assertEqual(ex.sixth_answers, '\nКошка спит.')
 
     def test_find_collocations_no_nouns(self):
@@ -127,7 +127,7 @@ class ExerciseBaseTests(unittest.TestCase):
         sents.append(sent)
         ex = Exercise(sents)
         ex.find_collocations(1)
-        self.assertEqual(ex.sixth_ex, 'Крепко спит.\n')
+        self.assertEqual(ex.sixth_ex, 'Задание №6: Выберите одно или несколько слов из списка, которые подходят в предложение по смыслу.\nПоставьте слово в правильную форму.\nКрепко спит.\n')
         self.assertEqual(ex.sixth_answers, '\nКрепко спит.')
 
     def test_synonyms(self):

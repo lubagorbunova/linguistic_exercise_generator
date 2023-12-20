@@ -117,7 +117,7 @@ class SentProcessor:
 
 
 class Exercise:
-    def __init__(self, processed_text: List[SentProcessor]):
+    def __init__(self, processed_text: List[SentProcessor], number_of_sent_in_each_ex = 5):
         """
         идеи для упражнений:
         1. синонимы - Соня
@@ -129,7 +129,7 @@ class Exercise:
         """
         self._morph_analyzer = MorphAnalyzer()
         self.processed_text = processed_text
-        # функции упражнений записывают строки в атрибуты
+        self.number_of_sent_in_each_ex = number_of_sent_in_each_ex
         self.first_ex = ''
         self.first_answers = ''
         self.second_ex = ''
@@ -141,14 +141,43 @@ class Exercise:
         self.sixth_ex = ''
         self.sixth_answers = ''
 
+    def run_exercises(self, ex_list: list):
+        """
+        запускает скрипт создания всех упражнений
+        :return:
+        """
+        if 1 in ex_list:
+            self.syn_ant_exercise('synonym')
+        if 2 in ex_list:
+            self.syn_ant_exercise('antonym')
+        if 3 in ex_list:
+            self.generate_scrambled_sentence()
+        if 4 in ex_list:
+            self.generate_case_exercise()
+        if 5 in ex_list:
+            self.select_grammatical_form(self.number_of_sent_in_each_ex)
+        if 6 in ex_list:
+            self.find_collocations(self.number_of_sent_in_each_ex)
+
     def form_exercises(self):
         '''
         объединяет все упражнения в один файл
         :return:
         '''
+        all_exercises = (self.first_ex + '\n' +
+                         self.second_ex + '\n' +
+                         self.third_ex + '\n' +
+                         self.fourth_ex + '\n' +
+                         self.fifth_ex +'\n' +
+                         self.sixth_ex)
+        all_answers = (self.first_answers + '\n' +
+                         self.second_answers + '\n' +
+                         self.third_answers + '\n' +
+                         self.fourth_answers + '\n' +
+                         self.fifth_answers + '\n' +
+                         self.sixth_answers)
+        return all_exercises, all_answers
 
-        self.syn_ant_exercise('synonym')
-        self.syn_ant_exercise('antonym')
 
     def syn_ant_exercise(self, task_type: str):
         """Делает задание на синонимы/антонимы"""
@@ -291,7 +320,7 @@ class Exercise:
         """
         sentences = random.sample(self.processed_text, number_of_sent)
         full_text = ''
-        text = ''
+        text = 'Задание №5: Поставьте слово в скобках в правильную форму:\n'
 
         for sent in sentences:
             sent_text = sent.get_raw_text()
@@ -332,7 +361,7 @@ class Exercise:
         """
         sentences = random.sample(self.processed_text, number_sent)
         full_text = ''
-        text = ''
+        text = 'Задание №6: Выберите одно или несколько слов из списка, которые подходят в предложение по смыслу.\nПоставьте слово в правильную форму.\n'
         path = os.path.dirname(__file__) + '/../navec_hudlit_v1_12B_500K_300d_100q.tar'
         navec = Navec.load(path)
 
