@@ -1,18 +1,16 @@
-import random
-import re
-
-from src.constants import punctuation, most_frequent_nouns
-from navec import Navec
-from pymorphy2 import MorphAnalyzer
-from typing import List
-from src.word import Word
-from numpy import dot
-from src.word import Word
-from numpy.linalg import norm
-import heapq
 import os.path
 import random
+import re
+from pathlib import Path
+from typing import List
 
+from numpy import dot, linalg
+import heapq
+from pymorphy2 import MorphAnalyzer
+from navec import Navec
+
+from src.constants import punctuation, ASSETS_PATH, most_frequent_nouns
+from src.word import Word
 
 class SentProcessor:
     """
@@ -42,23 +40,22 @@ class SentProcessor:
 
     def _lemmatise_text(self):
         """
-        Полина
-        посмотреть прошлогоднюю лабу
-        :return:
+        Определяет начальные формы токенов
+        return: None
         """
         self._lemma_text = [self._morph_analyzer.parse(token)[0].normal_form for token in self._tokens]
 
     def _morph_text(self):
         """
-        Полина
-        выделить морфологические признаки слов
-        :return:
+        Осуществляет морфологический анализ исходного текста:
+        Производит разбор текста на морфологические признаки и сохраняет их для каждого токена.
+        return: None
         """
         self._morph = [self._morph_analyzer.parse(token)[0].tag for token in self._tokens]
 
     def _vectorize_text(self):
         """
-        предобученная на основе корпуса художественных текстов на русском языке модель
+        Предобученная на основе корпуса художественных текстов на русском языке модель
         находит векторы для каждого токена. Пары токен-вектор хранятся в словаре
         :return: None
         """
@@ -82,35 +79,35 @@ class SentProcessor:
 
     def get_raw_text(self):
         """
-        возвращает исходный текст
+        Возвращает исходный текст.
         :return:
         """
         return self._raw_text
 
     def get_lemmas(self):
         """
-        возвращает словарные формы слов
+        Возвращает словарные формы слов.
         :return:
         """
         return self._lemma_text
 
     def get_morph(self):
         """
-        возвращает морфологические признаки слов
+        Возвращает морфологические признаки слов.
         :return:
         """
         return self._morph
 
     def get_tokens(self):
         """
-        возвращает токены
+        Взвращает токены.
         :return:
         """
         return self._tokens
 
     def get_vectors(self):
         """
-        возвращает словарь, ключи в котором - токены, а значения - векторы.
+        Возвращает словарь, ключи в котором - токены, а значения - векторы.
         :return: dict
         """
         return self._vector
@@ -119,13 +116,7 @@ class SentProcessor:
 class Exercise:
     def __init__(self, processed_text: List[SentProcessor], number_of_sent_in_each_ex = 5):
         """
-        идеи для упражнений:
-        1. синонимы - Соня
-        2. антонимы - Соня
-        3. поменять структуру предложений (вопрос из утверждения и тд) - Полина
-        4. выбрать нужный падеж - Полина
-        5. выбрать правильную форму слова - Люба
-        6. выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?) - Люба
+        Инициализирует объект класса Exercise.
         """
         self._morph_analyzer = MorphAnalyzer()
         self.processed_text = processed_text
@@ -143,7 +134,7 @@ class Exercise:
 
     def run_exercises(self, ex_list = [1, 2, 3, 4, 5, 6]):
         """
-        запускает скрипт создания всех упражнений
+        Запускает скрипт создания всех упражнений.
         :return:
         """
         if 1 in ex_list:
@@ -161,7 +152,7 @@ class Exercise:
 
     def form_exercises(self):
         '''
-        объединяет все упражнения в один файл
+        Объединяет все упражнения в один файл.
         :return:
         '''
         all_exercises = (self.first_ex +
@@ -179,7 +170,10 @@ class Exercise:
         return all_exercises, all_answers
 
     def syn_ant_exercise(self, task_type: str):
-        """Делает задание на синонимы/антонимы"""
+        """
+        Генерирует упражнение на синонимы/антонимы.
+        :return:
+        """
         sentence = random.choice(self.processed_text)
         lemmas = sentence.get_lemmas()
         synonyms = {}
@@ -217,9 +211,9 @@ class Exercise:
 
     def _get_options(self, thesaurus: dict, lemmas: list[str]):
         """
-        создает список вариантов, номер правильного ответа
+        Cоздает список вариантов, номер правильного ответа.
+        :return:
         """
-        #надо подумать над элс..мне чет не нравится
         answer = ''
         word_id = 0
         num_words = 0
@@ -256,7 +250,11 @@ class Exercise:
         return word_id, correct, task
 
     def generate_scrambled_sentence(self):
-        sentence = random.choice(self.processed_text)  # Выбираем случайное предложение из обработанного текста
+        """
+        Генерирует упражнение на составление предложения из лемм.
+        :return:
+        """
+        sentence = random.choice(self.processed_text)
         lemmas = sentence.get_lemmas()
         random.shuffle(lemmas)
 
@@ -270,22 +268,25 @@ class Exercise:
         self.third_answers = full_text
 
     def generate_case_exercise(self):
-        sentence = random.choice(self.processed_text)
-        tokens = list(sentence.get_tokens())
+        """
+        Генерирует упражнение на определение падежа существительного в предложении.
+        :return:
+        """
+        random_sentence = random.choice(self.processed_text)
+        sentence_tokens = list(random_sentence.get_tokens())
 
-        candidates = [word for word in tokens if 'NOUN' in self._morph_analyzer.parse(word)[0].tag]
+        noun_candidates = [word for word in sentence_tokens if 'NOUN' in self._morph_analyzer.parse(word)[0].tag]
 
-        if not candidates:
+        if not noun_candidates:
             return "В данном предложении нет существительных."
 
-        random.shuffle(tokens)
+        random.shuffle(sentence_tokens)
 
-        word_to_change = random.choice(candidates)
-        word_to_change1 = word_to_change.upper()
+        selected_noun = random.choice(noun_candidates)
+        selected_noun_upper = selected_noun.upper()
 
-        raw_sentence = sentence.get_raw_text()
+        raw_random_sentence = random_sentence.get_raw_text()
 
-        # Словарь для соответствия аббревиатур падежей и их русских названий
         cases_dict = {
             'nomn': 'Именительный',
             'gent': 'Родительный',
@@ -295,17 +296,13 @@ class Exercise:
             'loct': 'Предложный'
         }
 
-        correct_case_abbr = self._morph_analyzer.parse(word_to_change)[0].tag.case
+        correct_case_abbr = self._morph_analyzer.parse(selected_noun)[0].tag.case
         correct_case = cases_dict.get(correct_case_abbr)
 
-        exercise_task = f"\nЗадание №4: Выберите правильный падеж для слова '{word_to_change1}' в предложении '{raw_sentence}':\n"
+        exercise_task = f"\nЗадание №4: Выберите правильный падеж для слова '{selected_noun_upper}' в предложении '{raw_random_sentence}':\n"
 
-        exercise_task += f"1. {cases_dict['nomn']}\n"
-        exercise_task += f"2. {cases_dict['gent']}\n"
-        exercise_task += f"3. {cases_dict['datv']}\n"
-        exercise_task += f"4. {cases_dict['accs']}\n"
-        exercise_task += f"5. {cases_dict['ablt']}\n"
-        exercise_task += f"6. {cases_dict['loct']}\n"
+        for case_num, case_abbr in enumerate(cases_dict, start=1):
+            exercise_task += f"{case_num}. {cases_dict[case_abbr]}\n"
 
         full_text = f"\nОтветы на задание №4:\nПравильный ответ: {correct_case}\n"
 
@@ -314,7 +311,7 @@ class Exercise:
 
     def select_grammatical_form(self, number_of_sent):
         """
-        выбрать правильную форму слова
+        Генерирует упражнение на выбор правильной формы слова.
         :return:
         """
         sentences = random.sample(self.processed_text, number_of_sent)
@@ -355,7 +352,7 @@ class Exercise:
 
     def find_collocations(self, number_sent):
         """
-        выбрать из списка слов те, которые сочетаются с предложенным словом (найти колокации?)
+        Генерирует упражнение на поиск коллокаций для предложенных слов.
         :return:
         """
         sentences = random.sample(self.processed_text, number_sent)
@@ -407,3 +404,27 @@ class Exercise:
 
         self.sixth_ex = text
         self.sixth_answers = full_text
+
+
+class FinalFiles:
+    """
+    Класс для работы с файлами упражнений.
+    """
+    def __init__(self):
+        pass
+
+    def get_exercises_path(self) -> Path:
+        """
+        Возвращает путь к запрошенному упражнению.
+        :return:
+        """
+        exercise_name = f"exercise_raw.txt"
+        return ASSETS_PATH / exercise_name
+
+    def write_to_file(self, ex_text: str) -> None:
+        """
+        Записывает переданный текст упражнения в файл.
+        :return:
+        """
+        with open(self.get_exercises_path(), 'w', encoding='utf-8') as file:
+            file.write(ex_text)
