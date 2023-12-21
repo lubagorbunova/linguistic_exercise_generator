@@ -4,7 +4,7 @@ from src.files import Files, prepare_environment
 from nltk.tokenize import sent_tokenize
 
 if __name__ == '__main__':
-    prepare_environment(ASSETS_PATH)
+    #prepare_environment(ASSETS_PATH)
     print("Добро пожаловать в генератор упражнений по коллекции текстов на русском языке.\n"
           "Генератор может создать следующие упражнения:\n"
           "1. Упражнение на синонимы.\n"
