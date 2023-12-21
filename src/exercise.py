@@ -1,8 +1,8 @@
 import random
 import re
-from src.constants import punctuation, ASSETS_PATH, most_frequent_nouns
+
+from src.constants import punctuation, most_frequent_nouns
 from navec import Navec
-from pathlib import Path
 from pymorphy2 import MorphAnalyzer
 from typing import List
 from src.word import Word
@@ -407,24 +407,3 @@ class Exercise:
 
         self.sixth_ex = text
         self.sixth_answers = full_text
-
-
-class FinalFiles:
-    def __init__(self):
-        pass
-
-    def get_exercises_path(self) -> Path:
-        """
-        Returns path for requested exercise
-        """
-        exercise_name = f"exercise_raw.txt"
-        return ASSETS_PATH / exercise_name
-
-    def write_to_file(self, ex_text: str) -> None:
-        """
-        Соня
-        файл с упражнениями, который передается пользователю
-        :return:
-        """
-        with open(self.get_exercises_path(), 'w', encoding='utf-8') as file:
-            file.write(ex_text)
