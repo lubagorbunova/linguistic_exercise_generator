@@ -3,6 +3,7 @@ from src.exercise import SentProcessor, Exercise
 import numpy
 from pymorphy2.tagset import OpencorporaTag
 from src.word import Word
+from src.files import NothingToWriteError
 
 class ExerciseBaseTests(unittest.TestCase):
 
@@ -129,14 +130,53 @@ class ExerciseBaseTests(unittest.TestCase):
         msg = 'Something is wrong'
         self.assertTrue(all(test_value), msg)
 
-    def test_run_exercises(self):
-        pass
+    def test_run_exercises_correct_ex_exist(self):
+        sents = []
+        sent = SentProcessor('Кошка спит.')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents, number_of_sent_in_each_ex=1)
+        ex.run_exercises([3, 6])
+        value = False
+        if (len(ex.third_ex) != 0) and \
+            (len(ex.third_answers) != 0) and \
+            (len(ex.sixth_ex) != 0) and \
+            (len(ex.sixth_answers) != 0):
+            value = True
+        self.assertTrue(value, msg='Упражнения не сформированы')
 
-    def test_run_exercises_incorrect_input(self):
-        pass
+    def test_run_exercises_wrong_ex_run(self):
+        sents = []
+        sent = SentProcessor('Кошка спит.')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents, number_of_sent_in_each_ex=1)
+        ex.run_exercises([3, 6, 4, 5])
+        value = False
+        if (len(ex.first_ex) == 0) and \
+                (len(ex.first_answers) == 0) and \
+                (len(ex.second_ex) == 0) and \
+                (len(ex.second_answers) == 0):
+            value = True
+        self.assertTrue(value, msg='Лишние упражнения сформированы')
 
-    def form_exercises(self):
-        pass
+    def test_form_exercises(self):
+        sents = []
+        sent = SentProcessor('Кошка.')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents, number_of_sent_in_each_ex=1)
+        ex.run_exercises([3])
+        exercises, answers = ex.form_exercises()
+        self.assertEqual(exercises, '\nЗадание №3. Составьте предложение из слов '
+                                    'и поставьте их в правильную форму:\n[кошка]\n')
+        self.assertEqual(answers, '\nОтветы на задание №3:\nКошка.\n')
 
-    def form_exercises_before_form(self):
-        pass
+    def test_form_exercises_before_form(self):
+        sents = []
+        sent = SentProcessor('Кошка спит.')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents, number_of_sent_in_each_ex=1)
+        with self.assertRaises(NothingToWriteError):
+            ex.form_exercises()

@@ -11,6 +11,7 @@ from navec import Navec
 
 from src.constants import punctuation, ASSETS_PATH, most_frequent_nouns
 from src.word import Word
+from src.files import NothingToWriteError
 
 class SentProcessor:
     """
@@ -169,6 +170,8 @@ class Exercise:
                          self.fourth_answers +
                          self.fifth_answers +
                          self.sixth_answers)
+        if len(all_exercises)==0 or len(all_answers)==0:
+            raise NothingToWriteError
         return all_exercises, all_answers
 
     def syn_ant_exercise(self, task_type: str):
