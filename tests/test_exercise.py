@@ -1,7 +1,11 @@
 import unittest
 from src.exercise import SentProcessor, Exercise
-from src.word import Word
+
+import numpy
+from pymorphy2.tagset import OpencorporaTag
+
 from src.files import NothingToWriteError
+from src.word import Word
 
 class ExerciseBaseTests(unittest.TestCase):
 

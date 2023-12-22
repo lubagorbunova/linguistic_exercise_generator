@@ -7,10 +7,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-nltk = "^3.8.1"
 pytest = "^7.4.3"
 pylint = "^3.0.2"
-gensim = "^4.3.2"
 navec = "^0.10.0"
 pymorphy2= "^0.9.1"
 ruwordnet = "^0.0.6"

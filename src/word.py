@@ -1,5 +1,6 @@
 from ruwordnet import RuWordNet
 from wiki_ru_wordnet import WikiWordnet
+from src.constants import PROJECT_ROOT
 
 
 class Word:
@@ -10,7 +11,7 @@ class Word:
         self.synonyms = set()
         self.antonyms = set()
         self.wikiwordnet = WikiWordnet()
-        self.wn = RuWordNet()
+        self.wn = RuWordNet(filename_or_session=str(PROJECT_ROOT/'src'/'ruwordnet-2021.db'))
 
     def create_antonyms(self, word: str, antonyms: set):
         try:

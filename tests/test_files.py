@@ -37,8 +37,9 @@ class FilesBaseTests(unittest.TestCase):
 
     def test_writetofile_content(self):
         instance = Files('fortest.txt')
-        instance.text_path = ASSETS_PATH_TESTS.parent / instance.file_name
-        instance.write_to_file('вопросы', 'ответы')
+        instance.text_path = ASSETS_PATH.parent / instance.file_name
+        instance.write_to_file('вопросы', 'ответы', answers_path=ASSETS_PATH_TESTS / 'fortest_answers.txt',
+                               exercises_path=ASSETS_PATH_TESTS / 'fortest_answers.txt')
         with open(ASSETS_PATH_TESTS / 'fortest_exercises.txt', encoding='utf-8') as file:
             ex = file.read()
         self.assertEqual('вопросы', ex)

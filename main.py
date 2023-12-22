@@ -17,8 +17,10 @@ if __name__ == '__main__':
     print('Файлы, по которым можно создать упражнения:')
     for name in os.listdir(ASSETS_PATH.parent):
         if '.txt' in name:
-            print(name)
+            print(name.replace('.txt', ''))
     filename = input('Введите имя файла, по которому нужно сделать упражнения: ')
+    if not '.txt' in filename:
+        filename += '.txt'
     ex_list = input('Какие упражнения Вы хотите создать? Введите номера через запятую:')
     ex_list = list(int(i) for i in ex_list.split(','))
     file = Files(filename)

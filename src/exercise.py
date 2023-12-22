@@ -20,7 +20,7 @@ class SentProcessor:
     Предобрабатывает исходный текст:
     разбивает на токены, находит начальные формы, морфологические признаки и векторы.
     """
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         if isinstance(text, str):
             self._raw_text = text
         else:
@@ -33,34 +33,30 @@ class SentProcessor:
 
     def _tokenise_text(self) -> None:
         """
-        Очищает текст от знаков препинания, приводит к нижнему регистру, разбивает на токены
-        return: None
+        Очищает текст от знаков препинания, приводит к нижнему регистру, разбивает на токены.
         """
         raw_text = self._raw_text
         for el in punctuation:
             raw_text = raw_text.replace(el, ' ')
         self._tokens = raw_text.lower().split()
 
-    def _lemmatise_text(self):
+    def _lemmatise_text(self) -> None:
         """
-        Определяет начальные формы токенов
-        return: None
+        Определяет начальные формы токенов.
         """
         self._lemma_text = [self._morph_analyzer.parse(token)[0].normal_form for token in self._tokens]
 
-    def _morph_text(self):
+    def _morph_text(self) -> None:
         """
         Осуществляет морфологический анализ исходного текста:
         Производит разбор текста на морфологические признаки и сохраняет их для каждого токена.
-        return: None
         """
         self._morph = [self._morph_analyzer.parse(token)[0].tag for token in self._tokens]
 
-    def _vectorize_text(self):
+    def _vectorize_text(self) -> None:
         """
         Предобученная на основе корпуса художественных текстов на русском языке модель
-        находит векторы для каждого токена. Пары токен-вектор хранятся в словаре
-        :return: None
+        находит векторы для каждого токена. Пары токен-вектор хранятся в словаре.
         """
         path = os.path.dirname(__file__) + '/../navec_hudlit_v1_12B_500K_300d_100q.tar'
         navec = Navec.load(path)
@@ -70,78 +66,74 @@ class SentProcessor:
             else:
                 self._vector[lemma] = navec['<pad>']
 
-    def process_text(self):
+    def process_text(self) -> None:
         """
         Выполняет предобработку текста.
-        :return: None
         """
         self._tokenise_text()
         self._lemmatise_text()
         self._morph_text()
         self._vectorize_text()
 
-    def get_raw_text(self):
+    def get_raw_text(self) -> str:
         """
         Возвращает исходный текст.
-        :return:
         """
         return self._raw_text
 
-    def get_lemmas(self):
-        """
-        Возвращает словарные формы слов.
-        :return:
-        """
-        return self._lemma_text
-
-    def get_morph(self):
-        """
-        Возвращает морфологические признаки слов.
-        :return:
-        """
-        return self._morph
-
-    def get_tokens(self):
+    def get_tokens(self) -> list:
         """
         Взвращает токены.
-        :return:
         """
         return self._tokens
 
-    def get_vectors(self):
+    def get_lemmas(self) -> list:
+        """
+        Возвращает словарные формы слов.
+        """
+        return self._lemma_text
+
+    def get_morph(self) -> list:
+        """
+        Возвращает морфологические признаки слов.
+        """
+        return self._morph
+
+
+    def get_vectors(self) -> dict:
         """
         Возвращает словарь, ключи в котором - токены, а значения - векторы.
-        :return: dict
         """
         return self._vector
 
-
 class Exercise:
-    def __init__(self, processed_text: List[SentProcessor], number_of_sent_in_each_ex=5):
+    def __init__(self, processed_text: List[SentProcessor],
+                 number_of_sent_in_each_ex = 5) -> None:
         """
         Инициализирует объект класса Exercise.
         """
         self._morph_analyzer = MorphAnalyzer()
         self.processed_text = processed_text
         self.number_of_sent_in_each_ex = number_of_sent_in_each_ex
-        self.synonym_ex = ''
-        self.synonym_answers = ''
-        self.antonym_ex = ''
-        self.antonym_answers = ''
-        self.compose_ex = ''
-        self.compose_answers = ''
-        self.case_ex = ''
-        self.case_answers = ''
-        self.forms_ex = ''
-        self.forms_answers = ''
-        self.lexical_ex = ''
-        self.lexical_answers = ''
+        self.first_ex = ''
+        self.first_answers = ''
+        self.second_ex = ''
+        self.second_answers = ''
+        self.third_ex = ''
+        self.third_answers = ''
+        self.fourth_ex = ''
+        self.fourth_answers = ''
+        self.fifth_ex = ''
+        self.fifth_answers = ''
+        self.sixth_ex = ''
+        self.sixth_answers = ''
 
-    def run_exercises(self, ex_list=[1, 2, 3, 4, 5, 6]):
+    def run_exercises(self, ex_list=None) -> None:
         """
         Запускает скрипт создания всех упражнений.
-        :return:
         """
+        if ex_list is None:
+            ex_list = [1, 2, 3, 4, 5, 6]
         if 1 in ex_list:
             self.generate_synonyms()
         if 2 in ex_list:
@@ -155,10 +147,9 @@ class Exercise:
         if 6 in ex_list:
             self.find_collocations(self.number_of_sent_in_each_ex)
 
-    def form_exercises(self):
+    def form_exercises(self) -> tuple[str, str]:
         '''
         Объединяет все упражнения в один файл.
-        :return:
         '''
         all_exercises = (self.synonym_ex +
                          self.antonym_ex +
@@ -228,10 +219,9 @@ class Exercise:
 {antonym_task}\n"""
         self.antonym_answers = f'Правильный ответ:{correct}\n'
 
-    def _get_options(self, thesaurus: dict, lemmas: list[str]):
+    def _get_options(self, thesaurus: dict, lemmas: list[str]) -> tuple[int, int, str]:
         """
         Cоздает список вариантов, номер правильного ответа.
-        :return:
         """
         answer = ''
         word_id = 0
@@ -267,10 +257,9 @@ class Exercise:
 4 - {final_choices[3].upper()}"""
         return word_id, correct, task
 
-    def generate_scrambled_sentence(self):
+    def generate_scrambled_sentence(self) -> None:
         """
         Генерирует упражнение на составление предложения из лемм.
-        :return:
         """
         sentence = random.choice(self.processed_text)
         lemmas = sentence.get_lemmas()
@@ -285,10 +274,9 @@ class Exercise:
         self.compose_ex = exercise_task
         self.compose_answers = full_text
 
-    def generate_case_exercise(self):
+    def generate_case_exercise(self) -> None:
         """
         Генерирует упражнение на определение падежа существительного в предложении.
-        :return:
         """
         random_sentence = random.choice(self.processed_text)
         sentence_tokens = list(random_sentence.get_tokens())
@@ -296,7 +284,7 @@ class Exercise:
         noun_candidates = [word for word in sentence_tokens if 'NOUN' in self._morph_analyzer.parse(word)[0].tag]
 
         if not noun_candidates:
-            return "В данном предложении нет существительных."
+            self.fourth_ex = "В данном предложении нет существительных."
 
         random.shuffle(sentence_tokens)
 
@@ -327,10 +315,9 @@ class Exercise:
         self.case_ex = exercise_task
         self.case_answers = full_text
 
-    def select_grammatical_form(self, number_of_sent):
+    def select_grammatical_form(self, number_of_sent) -> None:
         """
         Генерирует упражнение на выбор правильной формы слова.
-        :return:
         """
         sentences = random.sample(self.processed_text, number_of_sent)
         full_text = '\nОтветы на задание №5: \n'
@@ -368,10 +355,9 @@ class Exercise:
         self.forms_ex = text
         self.forms_answers = full_text
 
-    def find_collocations(self, number_sent):
+    def find_collocations(self, number_sent) -> None:
         """
         Генерирует упражнение на поиск коллокаций для предложенных слов.
-        :return:
         """
         sentences = random.sample(self.processed_text, number_sent)
         full_text = '\nОтветы на задание №6:'
@@ -421,3 +407,4 @@ class Exercise:
 
         self.lexical_ex = text
         self.lexical_answers = full_text
+

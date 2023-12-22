@@ -53,14 +53,19 @@ class Files:
         answer_name = f"{self.file_name[:self.file_name.index('.')]}_answers.txt"
         return ASSETS_PATH / answer_name
 
-    def write_to_file(self, ex_text: str, answer_text: str) -> None:
+    def write_to_file(self, ex_text: str, answer_text: str, answers_path = None,
+                      exercises_path = None) -> None:
         """
         записывает упражнения и ответы в файлы, которые передаются пользователю
         :return:
         """
+        if answers_path == None:
+            answers_path = self.get_answers_path()
+        if exercises_path == None:
+            exercises_path = self.get_exercises_path()
         if (len(ex_text) == 0) or (len(answer_text) == 0):
             raise NothingToWriteError
-        with open(self.get_exercises_path(), 'w', encoding='utf-8') as file_1:
+        with open(exercises_path, 'w', encoding='utf-8') as file_1:
             file_1.write(ex_text)
-        with open(self.get_answers_path(), 'w', encoding='utf-8') as file_2:
+        with open(answers_path, 'w', encoding='utf-8') as file_2:
             file_2.write(answer_text)
