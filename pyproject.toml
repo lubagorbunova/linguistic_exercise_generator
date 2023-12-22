@@ -13,6 +13,8 @@ navec = "^0.10.0"
 pymorphy2= "^0.9.1"
 ruwordnet = "^0.0.6"
 wiki-ru-wordnet = "^1.0.3"
+numpy = "^1.26.2"
+nltk = "^3.8.1"
 
 
 [build-system]

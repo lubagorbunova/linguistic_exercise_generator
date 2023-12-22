@@ -4,12 +4,12 @@ import re
 from pathlib import Path
 from typing import List
 
-from numpy import dot, linalg
+from numpy import dot
 import heapq
 from pymorphy2 import MorphAnalyzer
 from navec import Navec
 
-from src.constants import punctuation, ASSETS_PATH, most_frequent_nouns
+from src.constants import punctuation, most_frequent_nouns
 from src.word import Word
 from src.files import NothingToWriteError
 
