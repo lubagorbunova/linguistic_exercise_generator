@@ -1,8 +1,7 @@
 import unittest
-from src.exercise import SentProcessor, Exercise
+from src.exercise import SentProcessor
 import numpy
 from pymorphy2.tagset import OpencorporaTag
-from src.word import Word
 
 
 class SentProcessorBaseTests(unittest.TestCase):
