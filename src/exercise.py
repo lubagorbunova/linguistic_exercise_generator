@@ -10,7 +10,7 @@ from pymorphy2 import MorphAnalyzer
 from navec import Navec
 
 from src.constants import punctuation, ASSETS_PATH, most_frequent_nouns, most_frequent_adjectives, most_frequent_verbs,\
-    most_frequent_adverbs
+    most_frequent_adverbs, PROJECT_ROOT
 from src.word import Word
 from src.files import NothingToWriteError
 
@@ -58,7 +58,7 @@ class SentProcessor:
         Предобученная на основе корпуса художественных текстов на русском языке модель
         находит векторы для каждого токена. Пары токен-вектор хранятся в словаре.
         """
-        path = os.path.dirname(__file__) + '\\navec_hudlit_v1_12B_500K_300d_100q.tar'
+        path = PROJECT_ROOT / 'src'/ 'navec_hudlit_v1_12B_500K_300d_100q.tar'
         navec = Navec.load(path)
         for lemma in self._lemma_text:
             if lemma in navec.vocab:
@@ -362,7 +362,7 @@ class Exercise:
         sentences = random.sample(self.processed_text, number_sent)
         full_text = '\nОтветы на задание №6:'
         text = '\nЗадание №6: Выберите одно или несколько слов из списка, которые подходят в предложение по смыслу.\nПоставьте слово в правильную форму.\n'
-        path = os.path.dirname(__file__) + '\\navec_hudlit_v1_12B_500K_300d_100q.tar'
+        path =  PROJECT_ROOT / 'src'/ 'navec_hudlit_v1_12B_500K_300d_100q.tar'
         navec = Navec.load(path)
 
         for sent in sentences:
