@@ -29,6 +29,9 @@ class Files:
         self.text_path = ASSETS_PATH.parent / file_name
 
     def read_file(self) -> str:
+        """
+        Читает файл. Жалуется, если файл пустой.
+        """
         with open(self.text_path, encoding='utf-8') as file:
             text = file.read()
         if len(text)==0:
@@ -37,7 +40,7 @@ class Files:
 
     def get_exercises_path(self) -> Path:
         """
-        Returns path for requested exercise
+        Возвращает путь к файлу, в котором будут храниться упражнения.
         """
         if self.file_name == '':
             raise NoFileError
@@ -46,7 +49,7 @@ class Files:
 
     def get_answers_path(self) -> Path:
         """
-        Returns path for requested exercise
+        Возвращает путь к файлу, в котором будут храниться ответы на упражнения.
         """
         if self.file_name == '':
             raise NoFileError
@@ -56,8 +59,7 @@ class Files:
     def write_to_file(self, ex_text: str, answer_text: str, answers_path = None,
                       exercises_path = None) -> None:
         """
-        записывает упражнения и ответы в файлы, которые передаются пользователю
-        :return:
+        Записывает упражнения и ответы в файлы, которые передаются пользователю.
         """
         if answers_path == None:
             answers_path = self.get_answers_path()
