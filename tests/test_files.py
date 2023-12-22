@@ -2,17 +2,19 @@ import unittest
 from src.files import Files, EmptyFileError, NoFileError, NothingToWriteError
 import shutil
 from pathlib import Path
-from src.constants import ASSETS_PATH
+from src.constants import ASSETS_PATH_TESTS, ASSETS_PATH
 from typing import Union
 
 
 class FilesBaseTests(unittest.TestCase):
     def test_readfile_content(self):
         instance = Files('fortest.txt')
+        instance.text_path = ASSETS_PATH_TESTS.parent / instance.file_name
         self.assertEqual(instance.read_file(), 'Кошка спит на диване.')
 
     def test_readfile_notempty(self):
         instance = Files('fortestempty.txt')
+        instance.text_path = ASSETS_PATH_TESTS.parent / instance.file_name
         with self.assertRaises(EmptyFileError):
             instance.read_file()
 
@@ -38,11 +40,12 @@ class FilesBaseTests(unittest.TestCase):
 
     def test_writetofile_content(self):
         instance = Files('fortest.txt')
+        instance.text_path = ASSETS_PATH_TESTS.parent / instance.file_name
         instance.write_to_file('вопросы', 'ответы')
-        with open(ASSETS_PATH / 'fortest_exercises.txt', encoding='utf-8') as file:
+        with open(ASSETS_PATH_TESTS / 'fortest_exercises.txt', encoding='utf-8') as file:
             ex = file.read()
         self.assertEqual('вопросы', ex)
-        with open(ASSETS_PATH / 'fortest_answers.txt', encoding='utf-8') as file:
+        with open(ASSETS_PATH_TESTS / 'fortest_answers.txt', encoding='utf-8') as file:
             answers = file.read()
         self.assertEqual('ответы', answers)
 

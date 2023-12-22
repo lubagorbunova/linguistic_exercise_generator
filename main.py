@@ -1,10 +1,10 @@
 from src.constants import ASSETS_PATH
 from src.exercise import SentProcessor, Exercise
-from src.files import Files, prepare_environment
+from src.files import Files
 from nltk.tokenize import sent_tokenize
+import os
 
 if __name__ == '__main__':
-    #prepare_environment(ASSETS_PATH)
     print("Добро пожаловать в генератор упражнений по коллекции текстов на русском языке.\n"
           "Генератор может создать следующие упражнения:\n"
           "1. Упражнение на синонимы.\n"
@@ -14,6 +14,10 @@ if __name__ == '__main__':
           "5. Упражнение на выбор грамматической формы.\n"
           "6. Упражнене на лексику.\n"
           )
+    print('Файлы, по которым можно создать упражнения:')
+    for name in os.listdir(ASSETS_PATH.parent):
+        if '.txt' in name:
+            print(name)
     filename = input('Введите имя файла, по которому нужно сделать упражнения: ')
     ex_list = input('Какие упражнения Вы хотите создать? Введите номера через запятую:')
     ex_list = list(int(i) for i in ex_list.split(','))

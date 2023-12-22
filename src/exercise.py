@@ -409,27 +409,3 @@ class Exercise:
 
         self.sixth_ex = text
         self.sixth_answers = full_text
-
-
-class FinalFiles:
-    """
-    Класс для работы с файлами упражнений.
-    """
-    def __init__(self):
-        pass
-
-    def get_exercises_path(self) -> Path:
-        """
-        Возвращает путь к запрошенному упражнению.
-        :return:
-        """
-        exercise_name = f"exercise_raw.txt"
-        return ASSETS_PATH / exercise_name
-
-    def write_to_file(self, ex_text: str) -> None:
-        """
-        Записывает переданный текст упражнения в файл.
-        :return:
-        """
-        with open(self.get_exercises_path(), 'w', encoding='utf-8') as file:
-            file.write(ex_text)
