@@ -105,7 +105,8 @@ class SentProcessor:
         return self._vector
 
 class Exercise:
-    def __init__(self, processed_text: List[SentProcessor], number_of_sent_in_each_ex = 5):
+    def __init__(self, processed_text: List[SentProcessor],
+                 number_of_sent_in_each_ex = 5) -> None:
         """
         Инициализирует объект класса Exercise.
         """
