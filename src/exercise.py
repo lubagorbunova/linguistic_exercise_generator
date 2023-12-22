@@ -9,9 +9,11 @@ import heapq
 from pymorphy2 import MorphAnalyzer
 from navec import Navec
 
-from src.constants import punctuation, ASSETS_PATH, most_frequent_nouns
+from src.constants import punctuation, ASSETS_PATH, most_frequent_nouns, most_frequent_adjectives, most_frequent_verbs,\
+    most_frequent_adverbs
 from src.word import Word
 from src.files import NothingToWriteError
+
 
 class SentProcessor:
     """
@@ -115,35 +117,35 @@ class SentProcessor:
 
 
 class Exercise:
-    def __init__(self, processed_text: List[SentProcessor], number_of_sent_in_each_ex = 5):
+    def __init__(self, processed_text: List[SentProcessor], number_of_sent_in_each_ex=5):
         """
         Инициализирует объект класса Exercise.
         """
         self._morph_analyzer = MorphAnalyzer()
         self.processed_text = processed_text
         self.number_of_sent_in_each_ex = number_of_sent_in_each_ex
-        self.first_ex = ''
-        self.first_answers = ''
-        self.second_ex = ''
-        self.second_answers = ''
-        self.third_ex = ''
-        self.third_answers = ''
-        self.fourth_ex = ''
-        self.fourth_answers = ''
-        self.fifth_ex = ''
-        self.fifth_answers = ''
-        self.sixth_ex = ''
-        self.sixth_answers = ''
+        self.synonym_ex = ''
+        self.synonym_answers = ''
+        self.antonym_ex = ''
+        self.antonym_answers = ''
+        self.compose_ex = ''
+        self.compose_answers = ''
+        self.case_ex = ''
+        self.case_answers = ''
+        self.forms_ex = ''
+        self.forms_answers = ''
+        self.lexical_ex = ''
+        self.lexical_answers = ''
 
-    def run_exercises(self, ex_list = [1, 2, 3, 4, 5, 6]):
+    def run_exercises(self, ex_list=[1, 2, 3, 4, 5, 6]):
         """
         Запускает скрипт создания всех упражнений.
         :return:
         """
         if 1 in ex_list:
-            self.syn_ant_exercise('synonym')
+            self.generate_synonyms()
         if 2 in ex_list:
-            self.syn_ant_exercise('antonym')
+            self.generate_antonyms()
         if 3 in ex_list:
             self.generate_scrambled_sentence()
         if 4 in ex_list:
@@ -158,61 +160,73 @@ class Exercise:
         Объединяет все упражнения в один файл.
         :return:
         '''
-        all_exercises = (self.first_ex +
-                         self.second_ex +
-                         self.third_ex +
-                         self.fourth_ex +
-                         self.fifth_ex +
-                         self.sixth_ex)
-        all_answers = (self.first_answers +
-                         self.second_answers +
-                         self.third_answers +
-                         self.fourth_answers +
-                         self.fifth_answers +
-                         self.sixth_answers)
-        if len(all_exercises)==0 or len(all_answers)==0:
+        all_exercises = (self.synonym_ex +
+                         self.antonym_ex +
+                         self.compose_ex +
+                         self.case_ex +
+                         self.forms_ex +
+                         self.lexical_ex)
+        all_answers = (self.synonym_answers +
+                       self.antonym_answers +
+                       self.compose_answers +
+                       self.case_answers +
+                       self.forms_answers +
+                       self.lexical_answers)
+        if len(all_exercises) == 0 or len(all_answers) == 0:
             raise NothingToWriteError
         return all_exercises, all_answers
 
-    def syn_ant_exercise(self, task_type: str):
+    def generate_synonyms(self) -> None:
         """
-        Генерирует упражнение на синонимы/антонимы.
-        :return:
+        Генерирует упражнение на синонимы.
         """
         sentence = random.choice(self.processed_text)
         lemmas = sentence.get_lemmas()
         synonyms = {}
-        antonyms = {}
-        for i, lemma in enumerate(lemmas):
-            word = Word(lemma, i)
+        while len(synonyms) < 1:
+            lemma = random.choice(lemmas)
+            idx = lemmas.index(lemma)
+            word = Word(lemma, idx)
             word.fill_sets()
-            if len(word.get_synonyms()) >= 1:
-                synonyms[i] = word.get_synonyms()
-            if len(word.get_antonyms()) >= 1:
-                antonyms[i] = word.get_antonyms()
+            if len(word.get_synonyms()) >= 2:
+                synonyms[idx] = word.get_synonyms()
+
         new_sentence = sentence.get_tokens()
+        if len(synonyms) == 0:
+            self.synonym_ex = 'Нет заданий с синонимами'
+            return
+        target_word, correct, synonym_task, = self._get_options(synonyms, lemmas)
+        new_sentence[target_word] = new_sentence[target_word].upper()
+        self.synonym_ex = f"""Выберите синоним к выделенному слову: \n
+{' '.join(new_sentence)} \n
+{synonym_task}\n"""
+        self.synonym_answers = f'Правильный ответ:{correct}\n'
 
-        if task_type == 'synonym':
-            if len(synonyms) == 0:
-                self.first_ex = 'NO TASK WITH SYNONYMS'
-                return
-            target_word, correct, synonym_task, = self._get_options(synonyms, lemmas)
-            new_sentence[target_word] = new_sentence[target_word].upper()
-            self.first_answers = correct
-            self.first_ex = f"""Выберите синоним к выделенному слову: \n
-    {' '.join(new_sentence)} \n
-    {synonym_task}"""
+    def generate_antonyms(self) -> None:
+        """
+        Генерирует упражнение на антонимы.
+        """
+        sentence = random.choice(self.processed_text)
+        lemmas = sentence.get_lemmas()
+        antonyms = {}
+        while len(antonyms) < 1:
+            lemma = random.choice(lemmas)
+            idx = lemmas.index(lemma)
+            word = Word(lemma, idx)
+            word.fill_sets()
+            if word.get_antonyms():
+                antonyms[idx] = word.get_antonyms()
 
-        if task_type == 'antonym':
-            if len(antonyms) == 0:
-                self.second_ex = 'NO TASK WITH ANTONYMS'
-                return
-            target_word, correct, antonym_task = self._get_options(antonyms, lemmas)
-            new_sentence[target_word] = new_sentence[target_word].upper()
-            self.second_answers = correct
-            self.second_ex = f"""Выберите антоним к выделенному слову: \n
-    {' '.join(new_sentence)} \n
-    {antonym_task}"""
+        new_sentence = sentence.get_tokens()
+        if len(antonyms) == 0:
+            self.antonym_ex = 'Нет заданий с антонимами'
+            return
+        target_word, correct, antonym_task = self._get_options(antonyms, lemmas)
+        new_sentence[target_word] = new_sentence[target_word].upper()
+        self.antonym_ex = f"""Выберите антоним к выделенному слову: \n
+{' '.join(new_sentence)} \n
+{antonym_task}\n"""
+        self.antonym_answers = f'Правильный ответ:{correct}\n'
 
     def _get_options(self, thesaurus: dict, lemmas: list[str]):
         """
@@ -222,36 +236,35 @@ class Exercise:
         answer = ''
         word_id = 0
         num_words = 0
-        while num_words <= 1:
-            word_id = random.choice(list(thesaurus.keys()))
+        while num_words < 1:
+            word_id = list(thesaurus.keys())[0]
             answer = random.sample(list(thesaurus[word_id]), 1)[0]
             if answer == lemmas[word_id]:
                 num_words = 0
             else:
                 num_words = len(thesaurus[word_id])
-        options = []
-        for i in list(thesaurus.values()):
-            options.extend(i)
-        if len(set(options)) > 4:
-            task_choices = set(random.sample(options, 3))
-            while len(task_choices) != 4:
-                if lemmas[word_id] in task_choices:
-                    task_choices.discard(lemmas[word_id])
-                if answer not in task_choices:
-                    task_choices.add(answer)
-                task_choices.add(random.choice(options))
-            final_choices = list(task_choices)
-            correct = final_choices.index(answer) + 1
-            task = f"""Варианты:\n 
-                1 - {final_choices[0].upper()} \n 
-                2 - {final_choices[1].upper()} \n 
-                3 - {final_choices[2].upper()} \n 
-                4 - {final_choices[3].upper()}"""
+        pos = self._morph_analyzer.parse(lemmas[word_id])[0].tag
+        options = ['нет', 'правильного', 'ответа']
+        if 'NOUN' in pos:
+            options = most_frequent_nouns
+        if 'ADJF' in pos:
+            options = most_frequent_adjectives
+        if 'INFN' in pos:
+            options = most_frequent_verbs
+        if 'ADVB' in pos:
+            options = most_frequent_adverbs
+        task_choices = set(random.sample(options, 3))
+        if answer not in task_choices:
+            task_choices.add(answer)
         else:
-            correct = options.index(answer) + 1
-            task = f"""Варианты:\n 
-                1 - {options[0].upper()} \n 
-                2 - {options[1].upper()} \n """
+            task_choices.add(random.choice(options))
+        final_choices = list(task_choices)
+        correct = final_choices.index(answer) + 1
+        task = f"""Варианты:\n 
+1 - {final_choices[0].upper()} \n 
+2 - {final_choices[1].upper()} \n 
+3 - {final_choices[2].upper()} \n 
+4 - {final_choices[3].upper()}"""
         return word_id, correct, task
 
     def generate_scrambled_sentence(self):
@@ -269,8 +282,8 @@ class Exercise:
 
         full_text = f'\nОтветы на задание №3:\n{sentence.get_raw_text()}\n'
 
-        self.third_ex = exercise_task
-        self.third_answers = full_text
+        self.compose_ex = exercise_task
+        self.compose_answers = full_text
 
     def generate_case_exercise(self):
         """
@@ -311,8 +324,8 @@ class Exercise:
 
         full_text = f"\nОтветы на задание №4:\nПравильный ответ: {correct_case}\n"
 
-        self.fourth_ex = exercise_task
-        self.fourth_answers = full_text
+        self.case_ex = exercise_task
+        self.case_answers = full_text
 
     def select_grammatical_form(self, number_of_sent):
         """
@@ -335,7 +348,7 @@ class Exercise:
                 if ('NOUN' in str(morphs[i])) or ('VERB' in str(morphs[i])):
                     possible_change.append(i)
 
-            if len(possible_change)>=3:
+            if len(possible_change) >= 3:
                 number_gaps = 3
             else:
                 number_gaps = len(possible_change)
@@ -352,8 +365,8 @@ class Exercise:
 
             text += sent_text + '\n'
 
-        self.fifth_ex = text
-        self.fifth_answers = full_text
+        self.forms_ex = text
+        self.forms_answers = full_text
 
     def find_collocations(self, number_sent):
         """
@@ -379,7 +392,7 @@ class Exercise:
                 if 'NOUN' in str(morphs[i]):
                     possible_change[tokens[i]] = lemmas[i]
 
-            if len(possible_change)>0:
+            if len(possible_change) > 0:
                 change_token = random.sample(possible_change.keys(), 1)[0]
                 change_lemma = possible_change[change_token]
                 change_vector = vectors[change_lemma]
@@ -389,7 +402,7 @@ class Exercise:
                 for noun in most_frequent_nouns:
                     other_vector = navec[noun]
                     cosine = dot(change_vector, other_vector)
-                    other_nouns[cosine]=noun
+                    other_nouns[cosine] = noun
                 other_keys = heapq.nlargest(5, other_nouns.keys())
 
                 new = []
@@ -406,6 +419,5 @@ class Exercise:
 
             text += sent_text + '\n'
 
-
-        self.sixth_ex = text
-        self.sixth_answers = full_text
+        self.lexical_ex = text
+        self.lexical_answers = full_text

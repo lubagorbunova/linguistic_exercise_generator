@@ -1,9 +1,6 @@
 import unittest
 from src.files import Files, EmptyFileError, NoFileError, NothingToWriteError
-import shutil
-from pathlib import Path
 from src.constants import ASSETS_PATH_TESTS, ASSETS_PATH
-from typing import Union
 
 
 class FilesBaseTests(unittest.TestCase):
