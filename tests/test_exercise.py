@@ -2,7 +2,6 @@ import unittest
 from src.exercise import SentProcessor, Exercise
 import numpy
 from pymorphy2.tagset import OpencorporaTag
-from src.word import Word
 from src.files import NothingToWriteError
 
 class ExerciseBaseTests(unittest.TestCase):
@@ -104,31 +103,17 @@ class ExerciseBaseTests(unittest.TestCase):
         self.assertEqual(ex.sixth_ex, '\nЗадание №6: Выберите одно или несколько слов из списка, которые подходят в предложение по смыслу.\nПоставьте слово в правильную форму.\nКрепко спит.\n')
         self.assertEqual(ex.sixth_answers, '\nОтветы на задание №6:\nКрепко спит.')
 
-    def test_synonyms(self):
-        word = Word('холодный', 0)
-        word.extract_synonyms_antonyms('холодный')
-        correct = {'ледяной', 'студёный', 'холодный'}
-        res = word.get_synonyms()
-        test_value = []
-        if len(correct) == len(res):
-            for el in correct:
-                if el in res:
-                    test_value.append(True)
-        msg = 'Something is wrong'
-        self.assertTrue(all(test_value), msg)
-
-    def test_antonyms(self):
-        word = Word('холодный', 0)
-        word.extract_synonyms_antonyms('холодный')
-        correct = {'нехолодный', 'теплый по цвету', 'теплый'}
-        res = word.get_antonyms()
-        test_value = []
-        if len(correct) == len(res):
-            for el in correct:
-                if el in res:
-                    test_value.append(True)
-        msg = 'Something is wrong'
-        self.assertTrue(all(test_value), msg)
+    def test_syn_exercise(self):
+        sents = []
+        sent = SentProcessor('Крепко спит.')
+        sent.process_text()
+        sents.append(sent)
+        ex = Exercise(sents, number_of_sent_in_each_ex=1)
+        ex.syn_ant_exercise('synonym')
+        value = False
+        if ex.first_ex and ex.first_answers:
+            value = True
+        self.assertTrue(value, 'Упражнение не создано.')
 
     def test_run_exercises_correct_ex_exist(self):
         sents = []

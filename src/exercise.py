@@ -198,8 +198,8 @@ class Exercise:
                 return
             target_word, correct, synonym_task, = self._get_options(synonyms, lemmas)
             new_sentence[target_word] = new_sentence[target_word].upper()
-            self.first_answers = correct
-            self.first_ex = f"""Выберите синоним к выделенному слову: \n
+            self.first_answers = 'Ответы на задание №1: \n' + str(correct)
+            self.first_ex = f"""Задание №1. Выберите синоним к выделенному слову: \n
     {' '.join(new_sentence)} \n
     {synonym_task}"""
 
@@ -209,8 +209,8 @@ class Exercise:
                 return
             target_word, correct, antonym_task = self._get_options(antonyms, lemmas)
             new_sentence[target_word] = new_sentence[target_word].upper()
-            self.second_answers = correct
-            self.second_ex = f"""Выберите антоним к выделенному слову: \n
+            self.second_answers = 'Ответы на задание №2: \n' + str(correct)
+            self.second_ex = f"""Задание №2. Выберите антоним к выделенному слову: \n
     {' '.join(new_sentence)} \n
     {antonym_task}"""
 
