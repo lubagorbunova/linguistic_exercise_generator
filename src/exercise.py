@@ -390,6 +390,5 @@ class Exercise:
 
             text += sent_text + '\n'
 
-
         self.sixth_ex = text
         self.sixth_answers = full_text
